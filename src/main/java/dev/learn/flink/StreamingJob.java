@@ -43,7 +43,8 @@ public class StreamingJob {
     public static void main(String[] args) throws Exception {
         // set up the streaming execution environment
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        DataStreamSource<String> datasource = env.socketTextStream("hadoop", 9999);
+        DataStreamSource<String> datasource = env.socketTextStream("hadoop", 9999)
+                .setParallelism(1);
 
         datasource.map(new WordCountMapFunction())
                 .keyBy((KeySelector<Tuple2<String, Integer>, Object>) stringIntegerTuple2 -> stringIntegerTuple2.f0)
