@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package dev.learn.flink;
+package dev.learn.flink.base;
 
 import dev.learn.flink.function.SumReduceFunction;
 import dev.learn.flink.function.WordCountMapFunction;
@@ -43,14 +43,13 @@ public class StreamingJob {
     public static void main(String[] args) throws Exception {
         // set up the streaming execution environment
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        DataStreamSource<String> datasource = env.socketTextStream("hadoop", 9999)
-                .setParallelism(1);
+        DataStreamSource<String> datasource = env.socketTextStream("hadoop", 9999);
 
         datasource.map(new WordCountMapFunction())
                 .keyBy((KeySelector<Tuple2<String, Integer>, Object>) stringIntegerTuple2 -> stringIntegerTuple2.f0)
                 .timeWindow(Time.seconds(30))
                 .reduce(new SumReduceFunction())
-                .print();
+                .print().setParallelism(1);
         env.execute("Flink Streaming Java API Skeleton");
     }
 }

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package dev.learn.flink;
+package dev.learn.flink.base;
 
 import com.google.common.collect.Lists;
 import dev.learn.flink.function.SumReduceFunction;
