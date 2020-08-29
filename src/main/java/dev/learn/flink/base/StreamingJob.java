@@ -45,10 +45,14 @@ public class StreamingJob {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         DataStreamSource<String> datasource = env.socketTextStream("hadoop", 9999);
 
-        datasource.map(new WordCountMapFunction())
+
+        datasource.uid("network-source").map(new WordCountMapFunction())
+                .slotSharingGroup("a")
+                .uid("map-id")
                 .keyBy((KeySelector<Tuple2<String, Integer>, Object>) stringIntegerTuple2 -> stringIntegerTuple2.f0)
                 .timeWindow(Time.seconds(30))
-                .reduce(new SumReduceFunction())
+                .reduce(new SumReduceFunction()).disableChaining()
+                .uid("reduce-id")
                 .print().setParallelism(1);
         env.execute("Flink Streaming Java API Skeleton");
     }
