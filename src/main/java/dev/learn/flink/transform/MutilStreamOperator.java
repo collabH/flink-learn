@@ -72,7 +72,6 @@ public class MutilStreamOperator {
         }).returns(TypeInformation.of(new TypeHint<Tuple2<String, Integer>>() {
         })).print();
 
-
         env.execute();
 
     }
