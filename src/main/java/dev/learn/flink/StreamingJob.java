@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package dev.learn.flink.base;
+package dev.learn.flink;
 
 import dev.learn.flink.function.SumReduceFunction;
 import dev.learn.flink.function.WordCountMapFunction;
