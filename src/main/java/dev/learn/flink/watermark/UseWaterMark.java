@@ -1,5 +1,8 @@
 package dev.learn.flink.watermark;
 
+import org.apache.flink.api.common.eventtime.BoundedOutOfOrdernessWatermarks;
+import org.apache.flink.api.common.eventtime.WatermarkGenerator;
+import org.apache.flink.api.common.eventtime.WatermarkGeneratorSupplier;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -24,7 +27,14 @@ public class UseWaterMark {
                 .print();
 
         //todo 自定义
-
+        datasource.assignTimestampsAndWatermarks(WatermarkStrategy.forGenerator(
+                new WatermarkGeneratorSupplier<Integer>() {
+                    @Override
+                    public WatermarkGenerator<Integer> createWatermarkGenerator(Context context) {
+                        return new BoundedOutOfOrdernessWatermarks<>(Duration.ZERO);
+                    }
+                }
+        ));
 
         env.execute();
     }
