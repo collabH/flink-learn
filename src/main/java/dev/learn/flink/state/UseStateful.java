@@ -1,8 +1,10 @@
 package dev.learn.flink.state;
 
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
+import org.apache.flink.api.common.state.StateTtlConfig;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
+import org.apache.flink.api.common.time.Time;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
@@ -22,14 +24,16 @@ public class UseStateful {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
+        env.setParallelism(1);
+
         DataStreamSource<Event> datasource = env.addSource(new SourceFunction<Event>() {
             @Override
             public void run(SourceContext<Event> sourceContext) throws Exception {
-                int id = 0;
+
                 int c = 0;
                 while (true) {
+                    int id = new Random().nextInt(10);
                     sourceContext.collect(new Event(id, c, System.currentTimeMillis() / 1000));
-                    id++;
                     c += new Random().nextInt(30);
                     Thread.sleep(1000);
                 }
@@ -48,15 +52,23 @@ public class UseStateful {
             }
         }).flatMap(new RichFlatMapFunction<Event, String>() {
             private transient ValueState<Integer> lastTempState;
-            private transient ValueState<Boolean> flagState;
+
+            private transient ValueState<Integer> ttlState;
 
             @Override
             public void open(Configuration parameters) throws Exception {
-                super.open(parameters);
-                ValueStateDescriptor<Integer> valueStateDescriptor = new ValueStateDescriptor<Integer>("count", Integer.class);
+                ValueStateDescriptor<Integer> valueStateDescriptor = new ValueStateDescriptor<>("count", Integer.class);
                 lastTempState = getRuntimeContext().getState(valueStateDescriptor);
-                ValueStateDescriptor<Boolean> flagValueDescriptor = new ValueStateDescriptor<Boolean>("flag", Boolean.class, true);
-                flagState = getRuntimeContext().getState(flagValueDescriptor);
+                // ttl state
+                StateTtlConfig ttlConfig = StateTtlConfig.newBuilder(Time.seconds(10))
+                        .neverReturnExpired()
+                        .updateTtlOnCreateAndWrite()
+                        .cleanupFullSnapshot()
+                        .build();
+                ValueStateDescriptor<Integer> ttlStateDescriptor = new ValueStateDescriptor<>("ttl-state", Integer.class);
+                // set up ttl
+                ttlStateDescriptor.enableTimeToLive(ttlConfig);
+                ttlState = getRuntimeContext().getState(ttlStateDescriptor);
             }
 
             @Override
@@ -64,7 +76,7 @@ public class UseStateful {
 
                 // 当天温度值
                 Integer currentTemp = value.getC();
-                if (!flagState.value()) {
+                if (lastTempState.value() != null) {
                     // 上次温度值
                     int lastTemp = lastTempState.value();
                     int diff = Math.abs(currentTemp - lastTemp);
@@ -73,8 +85,10 @@ public class UseStateful {
                         out.collect(value.getId() + ":" + value.getC() + ":" + value.getTimestamp() + "差值异常");
                     }
                 }
-                System.out.println(currentTemp);
-                flagState.update(false);
+                if (ttlState.value() != null) {
+                    System.out.println(ttlState.value());
+                }
+                ttlState.update(1);
                 lastTempState.update(currentTemp);
             }
         }).print();
