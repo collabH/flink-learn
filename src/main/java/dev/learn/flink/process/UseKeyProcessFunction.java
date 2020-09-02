@@ -2,6 +2,8 @@ package dev.learn.flink.process;
 
 import dev.learn.flink.domain.MessageEvent;
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.typeinfo.TypeHint;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
@@ -26,17 +28,20 @@ public class UseKeyProcessFunction {
                         return new MessageEvent(arr[0], arr[1], arr[2]);
                     }
                 });
-        OutputTag<Tuple2<String, String>> outputTag = new OutputTag<>("side-output");
 
-        eventSource.keyBy(new KeySelector<MessageEvent, String>() {
+        SingleOutputStreamOperator<String> process = eventSource.keyBy(new KeySelector<MessageEvent, String>() {
             @Override
             public String getKey(MessageEvent value) throws Exception {
                 return value.getId();
             }
-        }).process(new AlarmProcessFunction(5000L, outputTag))
-                .print();
+        }).process(new AlarmProcessFunction(5000L));
 
-        eventSource.getSideOutput(outputTag)
+        process.print();
+
+        // 从process获取侧边流
+        process.getSideOutput(new OutputTag<Tuple2<String, String>>("side-output", TypeInformation.of(new TypeHint<Tuple2<String, String>>() {
+        })) {
+        })
                 .print();
 
         env.execute();

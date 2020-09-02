@@ -12,16 +12,16 @@ import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.util.Collector;
 import org.apache.flink.util.OutputTag;
 
+/**
+ * @author babywang
+ */
 public class AlarmProcessFunction extends KeyedProcessFunction<String, MessageEvent, String> {
     private transient ValueState<Integer> lastTemperature;
     private transient ValueState<Long> lastTimerStamp;
-    private transient ValueState<Tuple2<String, String>> sideOutputState;
     private final Long interval;
-    private final OutputTag<Tuple2<String, String>> outputTag;
 
-    public AlarmProcessFunction(Long interval, OutputTag<Tuple2<String, String>> outputTag) {
+    public AlarmProcessFunction(Long interval) {
         this.interval = interval;
-        this.outputTag = outputTag;
     }
 
     /**
@@ -34,6 +34,8 @@ public class AlarmProcessFunction extends KeyedProcessFunction<String, MessageEv
      */
     @Override
     public void processElement(MessageEvent value, Context ctx, Collector<String> out) throws Exception {
+        ctx.output(new OutputTag<Tuple2<String, String>>("side-output", TypeInformation.of(new TypeHint<Tuple2<String, String>>() {
+        })){}, Tuple2.of(value.getId(), value.getTemperature() + "C"));
         // 当前key
         String currentKey = ctx.getCurrentKey();
 
@@ -47,7 +49,6 @@ public class AlarmProcessFunction extends KeyedProcessFunction<String, MessageEv
 
         // init last temp state
         if (lastTemp == null) {
-            sideOutputState.update(Tuple2.of(value.getId(), value.getTemperature() + "C"));
             // 更新温度状态
             lastTemperature.update(Integer.parseInt(value.getTemperature()));
             out.collect(currentKey + ":" + value.getTemperature() + ":" + value.getTimestamp());
@@ -56,6 +57,7 @@ public class AlarmProcessFunction extends KeyedProcessFunction<String, MessageEv
         Long lastTimerTimestamp = lastTimerStamp.value();
         // 比较当前温度,如果上次温度大于当前问题,移除定时器
         if (lastTemp >= Integer.parseInt(value.getTemperature())) {
+            lastTemperature.update(Integer.parseInt(value.getTemperature()));
             if (lastTimerTimestamp == null) {
                 out.collect(currentKey + ":" + value.getTemperature() + ":" + value.getTimestamp());
                 return;
@@ -70,15 +72,12 @@ public class AlarmProcessFunction extends KeyedProcessFunction<String, MessageEv
             lastTimerStamp.update(processingTime + this.interval);
         }
         out.collect(currentKey + ":" + value.getTemperature() + ":" + value.getTimestamp());
-        ctx.output(outputTag, sideOutputState.value());
     }
 
     @Override
     public void open(Configuration parameters) throws Exception {
         lastTemperature = getRuntimeContext().getState(new ValueStateDescriptor<>("lastTemperature-record", Integer.class));
         lastTimerStamp = getRuntimeContext().getState(new ValueStateDescriptor<>("lastTimerStamp", Long.class));
-        sideOutputState = getRuntimeContext().getState(new ValueStateDescriptor<>("side-output", TypeInformation.of(new TypeHint<Tuple2<String, String>>() {
-        })));
     }
 
     @Override
