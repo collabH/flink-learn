@@ -35,7 +35,8 @@ public class AlarmProcessFunction extends KeyedProcessFunction<String, MessageEv
     @Override
     public void processElement(MessageEvent value, Context ctx, Collector<String> out) throws Exception {
         ctx.output(new OutputTag<Tuple2<String, String>>("side-output", TypeInformation.of(new TypeHint<Tuple2<String, String>>() {
-        })){}, Tuple2.of(value.getId(), value.getTemperature() + "C"));
+        })) {
+        }, Tuple2.of(value.getId(), value.getTemperature() + "C"));
         // 当前key
         String currentKey = ctx.getCurrentKey();
 
