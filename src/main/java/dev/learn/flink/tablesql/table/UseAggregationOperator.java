@@ -3,7 +3,6 @@ package dev.learn.flink.tablesql.table;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.table.api.DataTypes;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.types.Row;
@@ -16,7 +15,7 @@ import static org.apache.flink.table.api.Expressions.$;
  * @author: by echo huang
  * @date: 2020/9/3 11:49 下午
  */
-public class UseAggregationOperatior {
+public class UseAggregationOperator {
     public static void main(String[] args) {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
@@ -30,7 +29,11 @@ public class UseAggregationOperatior {
         Table user = tableEnv.from("User");
 
         // groupBy
-        tableEnv.fromDataStream(tableEnv.toRetractStream(user, Row.class),$("f0"), $("f0"), $("f1"))
+        tableEnv.fromDataStream(tableEnv.toRetractStream(user, Row.class), $("dml"), $("value"))
+                .dropColumns($("dml"))
+                .groupBy($("value").get(0))
+                .select($("value").get(0).as("id"), $("value").get(1).count().as("count"))
+
                 .execute().print();
     }
 }
