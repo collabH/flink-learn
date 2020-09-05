@@ -12,8 +12,8 @@ import org.apache.flink.types.Row;
 
 import static org.apache.flink.table.api.Expressions.$;
 import static org.apache.flink.table.api.Expressions.CURRENT_RANGE;
-import static org.apache.flink.table.api.Expressions.UNBOUNDED_RANGE;
 import static org.apache.flink.table.api.Expressions.lit;
+import static org.apache.flink.table.api.Expressions.rowInterval;
 
 /**
  * @fileName: UseKafkaConnector.java
@@ -44,7 +44,6 @@ public class UseAggOperator {
                 ")");
 
 
-
         Table kafkaTable = tableEnv.from("kafkaTable");
 
         // groupBy window
@@ -67,7 +66,8 @@ public class UseAggOperator {
 
         // over window
         Table overWindow = kafkaTable.window(Over.partitionBy($("id"))
-                .orderBy($("user_time")).preceding(UNBOUNDED_RANGE)
+//                .orderBy($("user_time")).preceding(UNBOUNDED_RANGE)
+                .orderBy($("user_time")).preceding(rowInterval(10L))
                 .following(CURRENT_RANGE)
                 .as("w"))
                 .select($("id").max().over($("w")));

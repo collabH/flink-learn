@@ -49,7 +49,7 @@ public class AggOperator {
 
         // having
         Table havingTable = tableEnv.sqlQuery("select id,count(name) from kafkaTable group by id having count(name)>2");
-
+        
 
         tableEnv.toRetractStream(havingTable, Row.class)
                 .print();
