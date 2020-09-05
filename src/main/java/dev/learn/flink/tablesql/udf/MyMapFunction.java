@@ -1,4 +1,4 @@
-package dev.learn.flink.tablesql.table.udf;
+package dev.learn.flink.tablesql.udf;
 
 import org.apache.flink.table.functions.ScalarFunction;
 

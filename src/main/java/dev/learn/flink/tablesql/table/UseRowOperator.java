@@ -1,8 +1,8 @@
 package dev.learn.flink.tablesql.table;
 
-import dev.learn.flink.tablesql.table.udf.MyAggFunction;
-import dev.learn.flink.tablesql.table.udf.MyFlatMapFunction;
-import dev.learn.flink.tablesql.table.udf.MyMapFunction;
+import dev.learn.flink.tablesql.udf.MyAggFunction;
+import dev.learn.flink.tablesql.udf.MyFlatMapFunction;
+import dev.learn.flink.tablesql.udf.MyMapFunction;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.TableEnvironment;
 

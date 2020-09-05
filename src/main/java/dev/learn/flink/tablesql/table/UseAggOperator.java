@@ -11,7 +11,7 @@ import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.types.Row;
 
 import static org.apache.flink.table.api.Expressions.$;
-import static org.apache.flink.table.api.Expressions.CURRENT_RANGE;
+import static org.apache.flink.table.api.Expressions.CURRENT_ROW;
 import static org.apache.flink.table.api.Expressions.lit;
 import static org.apache.flink.table.api.Expressions.rowInterval;
 
@@ -68,7 +68,7 @@ public class UseAggOperator {
         Table overWindow = kafkaTable.window(Over.partitionBy($("id"))
 //                .orderBy($("user_time")).preceding(UNBOUNDED_RANGE)
                 .orderBy($("user_time")).preceding(rowInterval(10L))
-                .following(CURRENT_RANGE)
+                .following(CURRENT_ROW)
                 .as("w"))
                 .select($("id").max().over($("w")));
 
