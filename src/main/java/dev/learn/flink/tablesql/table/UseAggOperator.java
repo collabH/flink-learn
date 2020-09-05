@@ -2,8 +2,11 @@ package dev.learn.flink.tablesql.table;
 
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.Over;
+import org.apache.flink.table.api.Session;
+import org.apache.flink.table.api.Slide;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.Tumble;
+import org.apache.flink.table.api.WindowGroupedTable;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.types.Row;
 
@@ -41,14 +44,26 @@ public class UseAggOperator {
                 ")");
 
 
+
         Table kafkaTable = tableEnv.from("kafkaTable");
 
         // groupBy window
-        Table groupByWindow = kafkaTable.window(Tumble.over(lit(20).second()).on($("user_time")).as("w"))
+        Table groupByWindow = kafkaTable
+                .window(Tumble.over(lit(20).second()).on($("user_time")).as("w"))
                 .groupBy($("id"), $("w"))
                 .select($("id"), $("w").start().as("start_time"),
                         $("w").end().as("end_time"),
                         $("name").count().as("count1"));
+
+        // slide window
+        Table slideWindow = kafkaTable
+                .window(Slide.over(lit(10).minutes()).every(lit(5).minutes()).on($("user_time")).as("w"))
+                .groupBy($("w"), $("id"))
+                .select($("w").start(), $("w").end());
+
+        // session window
+        WindowGroupedTable sessionWindow = kafkaTable.window(Session.withGap(lit(10).minutes()).on($("user_time")).as("w"))
+                .groupBy($("w"));
 
         // over window
         Table overWindow = kafkaTable.window(Over.partitionBy($("id"))
