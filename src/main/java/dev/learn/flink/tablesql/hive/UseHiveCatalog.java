@@ -1,12 +1,12 @@
 package dev.learn.flink.tablesql.hive;
 
 import dev.learn.flink.tablesql.table.StreamEnvironment;
-import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.SqlDialect;
-import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
-import org.apache.flink.table.catalog.CatalogTableImpl;
-import org.apache.flink.table.catalog.exceptions.DatabaseNotExistException;
+import org.apache.flink.table.api.Table;
+import org.apache.flink.table.api.TableEnvironment;
 import org.apache.flink.table.catalog.hive.HiveCatalog;
+
+import static org.apache.flink.table.api.Expressions.$;
 
 /**
  * @fileName: UseHiveCatalog.java
@@ -15,9 +15,8 @@ import org.apache.flink.table.catalog.hive.HiveCatalog;
  * @date: 2020/9/6 6:19 下午
  */
 public class UseHiveCatalog {
-    public static void main(String[] args) throws DatabaseNotExistException {
-        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        StreamTableEnvironment tableEnv = StreamEnvironment.getEnv(env);
+    public static void main(String[] args) throws Exception {
+        TableEnvironment tableEnv = StreamEnvironment.getBatchEnv();
 
         String hiveCatalogName = "myhive";
         String databaseName = "bussine_dws";
@@ -31,10 +30,27 @@ public class UseHiveCatalog {
 
         tableEnv.useCatalog(hiveCatalogName);
         tableEnv.useDatabase(databaseName);
-        tableEnv.getConfig().setSqlDialect(SqlDialect.HIVE);
+
 
         // 流式读取
-        tableEnv.sqlQuery("select * from dws_user_action")
-                .executeInsert("dws_user");
+        Table table = tableEnv.sqlQuery("select * from dws_user_action");
+        tableEnv.getConfig().setSqlDialect(SqlDialect.HIVE);
+        // 创建ads层
+        tableEnv.executeSql("drop table if exists ads_user");
+        tableEnv.executeSql("create table ads_user(total_count bigint)stored as parquet");
+
+        table
+                .select($("payment_count").count().as("total_count"))
+                .executeInsert("ads_user");
+
+
+        tableEnv.sqlQuery("select * from ads_user")
+                .execute()
+                .print();
+
+
+//        tableEnv.toRetractStream(adsUser, Row.class).print();
+
+//        env.execute();
     }
 }
