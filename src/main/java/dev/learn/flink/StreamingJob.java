@@ -43,7 +43,7 @@ public class StreamingJob {
     public static void main(String[] args) throws Exception {
         // set up the streaming execution environment
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        DataStreamSource<String> datasource = env.socketTextStream("hadoop", 9999);
+        DataStreamSource<String> datasource = env.socketTextStream("hadoop", 10089);
 
 
         datasource.uid("network-source").map(new WordCountMapFunction())
@@ -54,6 +54,7 @@ public class StreamingJob {
                 .reduce(new SumReduceFunction()).disableChaining()
                 .uid("reduce-id")
                 .print().setParallelism(1);
+        System.out.println(env.getExecutionPlan());
         env.execute("Flink Streaming Java API Skeleton");
     }
 }

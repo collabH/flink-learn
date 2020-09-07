@@ -72,7 +72,8 @@ public class BatchJob {
                 .groupBy(0)
                 .reduce(new SumReduceFunction())
                 .print();
+        System.out.println(env.getExecutionPlan());
 
-//        env.execute("Flink Batch Java API Skeleton");
+        env.execute("Flink Batch Java API Skeleton");
     }
 }
