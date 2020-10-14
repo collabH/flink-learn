@@ -1,5 +1,8 @@
 package dev.learn.flink.window;
 
+import org.apache.flink.calcite.shaded.com.google.common.hash.BloomFilter;
+import org.apache.flink.calcite.shaded.com.google.common.hash.Funnel;
+import org.apache.flink.calcite.shaded.com.google.common.hash.PrimitiveSink;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
@@ -15,6 +18,5 @@ public class UseTimeCharacter {
 
         // 设置时间语义
         env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
-
     }
 }

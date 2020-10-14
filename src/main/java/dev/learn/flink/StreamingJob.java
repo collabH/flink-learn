@@ -24,7 +24,9 @@ import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.streaming.api.windowing.time.Time;
+import org.apache.flink.util.Collector;
 
 /**
  * Skeleton for a Flink Streaming Job.
@@ -54,6 +56,9 @@ public class StreamingJob {
                 .reduce(new SumReduceFunction()).disableChaining()
                 .uid("reduce-id")
                 .print().setParallelism(1);
+
+
+
         System.out.println(env.getExecutionPlan());
         env.execute("Flink Streaming Java API Skeleton");
     }

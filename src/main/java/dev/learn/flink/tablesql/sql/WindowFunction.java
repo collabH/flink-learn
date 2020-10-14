@@ -43,8 +43,7 @@ public class WindowFunction {
 
         // 滚动时间
         Table table = tableEnv.sqlQuery("select id,count(name) as num,tumble_start(ts,INTERVAL '10' second) as start_time,tumble_end(ts,INTERVAL '10' second) as end_time from kafkaTable " +
-                "group by tumble(ts,INTERVAL '10' second),id" +
-                "");
+                "group by tumble(ts,INTERVAL '10' second),id");
 
         // topN
         Table topFive = tableEnv.sqlQuery("select id,name,row_num from(" +
