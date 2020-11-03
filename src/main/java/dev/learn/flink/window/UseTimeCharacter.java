@@ -5,6 +5,7 @@ import org.apache.flink.calcite.shaded.com.google.common.hash.Funnel;
 import org.apache.flink.calcite.shaded.com.google.common.hash.PrimitiveSink;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.util.OutputTag;
 
 /**
  * @fileName: UseTimeCharacter.java
