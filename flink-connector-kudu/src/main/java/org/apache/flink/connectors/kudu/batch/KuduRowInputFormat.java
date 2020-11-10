@@ -41,6 +41,7 @@ import java.util.List;
 import static org.apache.flink.util.Preconditions.checkNotNull;
 
 /**
+ * 用于读取kudu行输入格式
  * Input format for reading the contents of a Kudu table (defined by the provided {@link KuduTableInfo}) in both batch
  * and stream programs. Rows of the Kudu table are mapped to {@link Row} instances that can converted to other data
  * types by the user later if necessary.

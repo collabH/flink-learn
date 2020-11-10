@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * kudu元素映射基础类
  * Base implementation for {@link KuduOperationMapper}s that have one-to-one input to
  * Kudu operation mapping. It requires a fixed table schema to be provided at construction
  * time and only requires users to implement a getter for a specific column index (relative
@@ -66,6 +67,9 @@ public abstract class AbstractSingleOperationMapper<T> implements KuduOperationM
         if (operation == null) {
             throw new UnsupportedOperationException("createBaseOperation must be overridden if no operation specified in constructor");
         }
+        /**
+         * 根据不同操作类型封装不同的kudu operation
+         */
         switch (operation) {
             case INSERT:
                 return Optional.of(table.newInsert());
@@ -82,18 +86,22 @@ public abstract class AbstractSingleOperationMapper<T> implements KuduOperationM
 
     @Override
     public List<Operation> createOperations(T input, KuduTable table) {
+        // 创建Operation
         Optional<Operation> operationOpt = createBaseOperation(input, table);
         if (!operationOpt.isPresent()) {
             return Collections.emptyList();
         }
 
         Operation operation = operationOpt.get();
+        // 获取操作行
         PartialRow partialRow = operation.getRow();
 
+        // 调用kudu client元素api，将列名和列值放入
         for (int i = 0; i < columnNames.length; i++) {
             partialRow.addObject(columnNames[i], getField(input, i));
         }
 
+        // 返回Operation集合
         return Collections.singletonList(operation);
     }
 

@@ -25,12 +25,20 @@ import java.io.Serializable;
 import static org.apache.flink.util.Preconditions.checkNotNull;
 
 /**
+ * 配置使用KuduRowInputFormat
+ * 指定连接和其他必要的配置
  * Configuration used by {@link org.apache.flink.connectors.kudu.batch.KuduRowInputFormat}. Specifies connection and other necessary properties.
  */
 @PublicEvolving
 public class KuduReaderConfig implements Serializable {
 
+    /**
+     * kudu master配置
+     */
     private final String masters;
+    /**
+     * kudu读取行数限制
+     */
     private final int rowLimit;
 
     private KuduReaderConfig(

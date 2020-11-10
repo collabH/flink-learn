@@ -37,6 +37,7 @@ import java.io.IOException;
 import static org.apache.flink.util.Preconditions.checkNotNull;
 
 /**
+ * 写入kudu的写入格式
  * Output format for writing data into a Kudu table (defined by the provided {@link KuduTableInfo}) in both batch
  * and stream programs.
  */
@@ -45,11 +46,16 @@ public class KuduOutputFormat<IN> extends RichOutputFormat<IN> implements Checkp
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
+    // kudu table新型
     private final KuduTableInfo tableInfo;
+    // kudu 写入配置
     private final KuduWriterConfig writerConfig;
+    // kudu 失败处理器
     private final KuduFailureHandler failureHandler;
+    // kudu 操作映射
     private final KuduOperationMapper<IN> opsMapper;
 
+    // kudu 写入器
     private transient KuduWriter kuduWriter;
 
     public KuduOutputFormat(KuduWriterConfig writerConfig, KuduTableInfo tableInfo, KuduOperationMapper<IN> opsMapper) {
@@ -67,6 +73,11 @@ public class KuduOutputFormat<IN> extends RichOutputFormat<IN> implements Checkp
     public void configure(Configuration parameters) {
     }
 
+    /**
+     * @param taskNumber 并行的实例数
+     * @param numTasks 并行任务数
+     * @throws IOException
+     */
     @Override
     public void open(int taskNumber, int numTasks) throws IOException {
         kuduWriter = new KuduWriter(tableInfo, writerConfig, opsMapper, failureHandler);
@@ -74,6 +85,7 @@ public class KuduOutputFormat<IN> extends RichOutputFormat<IN> implements Checkp
 
     @Override
     public void writeRecord(IN row) throws IOException {
+        // 序列化
         kuduWriter.write(row);
     }
 
@@ -86,6 +98,7 @@ public class KuduOutputFormat<IN> extends RichOutputFormat<IN> implements Checkp
 
     @Override
     public void snapshotState(FunctionSnapshotContext functionSnapshotContext) throws Exception {
+        // 做checkpoint
         kuduWriter.flushAndCheckErrors();
     }
 

@@ -33,13 +33,25 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * kudu 读取器
+ */
 @Internal
 public class KuduReader implements AutoCloseable {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
+    /**
+     * kudu表操作客户端
+     */
     private final KuduTableInfo tableInfo;
+    /**
+     * kudu读取配置
+     */
     private final KuduReaderConfig readerConfig;
+    /**
+     * kudu表过滤信息
+     */
     private final List<KuduFilterInfo> tableFilters;
     private final List<String> tableProjections;
 

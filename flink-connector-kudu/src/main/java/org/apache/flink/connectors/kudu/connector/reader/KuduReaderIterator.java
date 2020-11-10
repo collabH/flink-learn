@@ -25,10 +25,19 @@ import org.apache.kudu.client.KuduScanner;
 import org.apache.kudu.client.RowResult;
 import org.apache.kudu.client.RowResultIterator;
 
+/**
+ * kduu读取器迭代器
+ */
 @Internal
 public class KuduReaderIterator {
 
+    /**
+     * kudu scanner
+     */
     private KuduScanner scanner;
+    /**
+     * 行结果迭代器
+     */
     private RowResultIterator rowIterator;
 
     public KuduReaderIterator(KuduScanner scanner) throws KuduException {
@@ -60,6 +69,11 @@ public class KuduReaderIterator {
         this.rowIterator = scanner.nextRows();
     }
 
+    /**
+     * 将kudu行转换为flink Row
+     * @param row
+     * @return
+     */
     private Row toFlinkRow(RowResult row) {
         Schema schema = row.getColumnProjection();
 

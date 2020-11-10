@@ -19,6 +19,9 @@ package org.apache.flink.connectors.kudu.connector.writer;
 import org.apache.flink.annotation.PublicEvolving;
 import org.apache.flink.types.Row;
 
+/**
+ * Row操作映射
+ */
 @PublicEvolving
 public class RowOperationMapper extends AbstractSingleOperationMapper<Row> {
 

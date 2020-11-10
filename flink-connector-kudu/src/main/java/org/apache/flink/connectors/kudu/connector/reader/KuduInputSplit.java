@@ -19,6 +19,9 @@ package org.apache.flink.connectors.kudu.connector.reader;
 import org.apache.flink.annotation.Internal;
 import org.apache.flink.core.io.LocatableInputSplit;
 
+/**
+ * kudu输入 split
+ */
 @Internal
 public class KuduInputSplit extends LocatableInputSplit {
 

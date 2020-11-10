@@ -32,7 +32,13 @@ import static org.apache.kudu.client.SessionConfiguration.FlushMode;
 @PublicEvolving
 public class KuduWriterConfig implements Serializable {
 
+    /**
+     * kudu master server地址
+     */
     private final String masters;
+    /**
+     * 会话刷新模式
+     */
     private final FlushMode flushMode;
 
     private KuduWriterConfig(

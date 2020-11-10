@@ -28,19 +28,24 @@ import org.apache.flink.runtime.state.FunctionInitializationContext;
 import org.apache.flink.runtime.state.FunctionSnapshotContext;
 import org.apache.flink.streaming.api.checkpoint.CheckpointedFunction;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.apache.flink.util.Preconditions.checkNotNull;
 
 /**
+ * 根据接收的元素执行Kudu操作的流式sink。
  * Streaming Sink that executes Kudu operations based on the incoming elements.
+ * 目标的kudu table定义在KuduTableInfo对象中包含一些表的创建的参数
  * The target Kudu table is defined in the {@link KuduTableInfo} object together with parameters for table
  * creation in case the table does not exist.
  * <p>
+ * 接收元素被映射在kudu表的operations使用提供的KuduOperationMapper  当写入数据失败是通过KuduFailureHandler实例来处理
  * Incoming records are mapped to Kudu table operations using the provided {@link KuduOperationMapper} logic. While
  * failures resulting from the operations are handled by the {@link KuduFailureHandler} instance.
+ * <p>
+ * <p>
+ * 实现flink的RichSinkFunction和CheckpointedFunction
  *
  * @param <IN> Type of the input records
  */
@@ -49,10 +54,15 @@ public class KuduSink<IN> extends RichSinkFunction<IN> implements CheckpointedFu
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
+    // kudu table 信息
     private final KuduTableInfo tableInfo;
+    // kudu 写入配置包含master、session刷新模式
     private final KuduWriterConfig writerConfig;
+    // 失败处理器
     private final KuduFailureHandler failureHandler;
+    // kudu操作映射，主要包含insert、update、delete、query等等
     private final KuduOperationMapper<IN> opsMapper;
+    // kudu写入序列化器
     private transient KuduWriter kuduWriter;
 
     /**
@@ -89,7 +99,7 @@ public class KuduSink<IN> extends RichSinkFunction<IN> implements CheckpointedFu
     }
 
     @Override
-    public void invoke(IN value) throws Exception {
+    public void invoke(IN value, Context context) throws Exception {
         try {
             kuduWriter.write(value);
         } catch (ClassCastException e) {

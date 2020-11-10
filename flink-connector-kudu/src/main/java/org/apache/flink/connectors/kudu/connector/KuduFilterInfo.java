@@ -17,7 +17,6 @@
 package org.apache.flink.connectors.kudu.connector;
 
 import org.apache.flink.annotation.PublicEvolving;
-
 import org.apache.kudu.ColumnSchema;
 import org.apache.kudu.Schema;
 import org.apache.kudu.client.KuduPredicate;
@@ -25,21 +24,41 @@ import org.apache.kudu.client.KuduPredicate;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * kudu列过滤器操作信息
+ */
 @PublicEvolving
 public class KuduFilterInfo implements Serializable {
 
+    /**
+     * 列
+     */
     private String column;
+    /**
+     * 大于、大于等于、小于、小于等于、不为同等等
+     */
     private FilterType type;
+    /**
+     * 值
+     */
     private Object value;
 
-    private KuduFilterInfo() { }
+    private KuduFilterInfo() {
+    }
 
     public KuduPredicate toPredicate(Schema schema) {
         return toPredicate(schema.getColumn(this.column));
     }
 
+    /**
+     * 将ColumnSchema转为KuduPredicate
+     *
+     * @param column
+     * @return
+     */
     public KuduPredicate toPredicate(ColumnSchema column) {
         KuduPredicate predicate;
+        // 根据不通filterType得到不同类型的KuduPredicate
         switch (this.type) {
             case IS_IN:
                 predicate = KuduPredicate.newInListPredicate(column, (List<?>) this.value);
@@ -63,6 +82,9 @@ public class KuduFilterInfo implements Serializable {
 
         KuduPredicate predicate;
 
+        /**
+         * 根据类型获取不通比较器格式的KuduPredicate
+         */
         switch (column.getType()) {
             case STRING:
                 predicate = KuduPredicate.newComparisonPredicate(column, comparison, (String) this.value);
@@ -102,7 +124,13 @@ public class KuduFilterInfo implements Serializable {
     }
 
     public enum FilterType {
+        /**
+         * 大于
+         */
         GREATER(KuduPredicate.ComparisonOp.GREATER),
+        /**
+         * 大于等于
+         */
         GREATER_EQUAL(KuduPredicate.ComparisonOp.GREATER_EQUAL),
         EQUAL(KuduPredicate.ComparisonOp.EQUAL),
         LESS(KuduPredicate.ComparisonOp.LESS),

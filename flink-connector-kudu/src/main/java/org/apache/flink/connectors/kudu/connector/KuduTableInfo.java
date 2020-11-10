@@ -28,13 +28,16 @@ import java.io.Serializable;
  * Describes which table should be used in sources and sinks along with specifications
  * on how to create it if it does not exist.
  *
+ * 读取已经存在的表通过KuduTableInfo#fromTable()方法，如果你想要在这个系统中创建表需要指定column和属性工厂createTableIfNotExists
  * <p> For sources and sinks reading from already existing tables, simply use @{@link KuduTableInfo#forTable(String)}
  * and if you want the system to create the table if it does not exist you need to specify the column and options
  * factories through {@link KuduTableInfo#createTableIfNotExists}
  */
 @PublicEvolving
 public class KuduTableInfo implements Serializable {
-
+    /**
+     * table name
+     */
     private String name;
     private CreateTableOptionsFactory createTableOptionsFactory = null;
     private ColumnSchemasFactory schemasFactory = null;

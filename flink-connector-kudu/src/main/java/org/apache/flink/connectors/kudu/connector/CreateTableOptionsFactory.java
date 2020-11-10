@@ -34,6 +34,8 @@ import java.io.Serializable;
 public interface CreateTableOptionsFactory extends Serializable {
 
     /**
+     * 创建CreateTableOptions将在CREATETABLE操作过程中使用
+     *  用于封装创建table的熟悉
      * Creates the {@link CreateTableOptions} that will be used during the createTable operation.
      *
      * @return CreateTableOptions for creating the table.
