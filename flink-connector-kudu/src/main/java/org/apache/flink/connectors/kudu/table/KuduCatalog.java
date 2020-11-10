@@ -21,6 +21,7 @@ package org.apache.flink.connectors.kudu.table;
 import org.apache.flink.annotation.PublicEvolving;
 import org.apache.flink.connectors.kudu.connector.KuduTableInfo;
 import org.apache.flink.connectors.kudu.table.utils.KuduTableUtils;
+import org.apache.flink.shaded.guava18.com.google.common.collect.Lists;
 import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.table.catalog.CatalogBaseTable;
@@ -41,9 +42,6 @@ import org.apache.flink.table.catalog.stats.CatalogTableStatistics;
 import org.apache.flink.table.expressions.Expression;
 import org.apache.flink.table.factories.TableFactory;
 import org.apache.flink.util.StringUtils;
-
-import org.apache.flink.shaded.guava18.com.google.common.collect.Lists;
-
 import org.apache.kudu.ColumnSchema;
 import org.apache.kudu.client.AlterTableOptions;
 import org.apache.kudu.client.KuduClient;
@@ -71,11 +69,13 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
 
 /**
  * Catalog for reading and creating Kudu tables.
+ * 用于读取和创建kudu表
  */
 @PublicEvolving
 public class KuduCatalog extends AbstractReadOnlyCatalog {
 
     private static final Logger LOG = LoggerFactory.getLogger(KuduCatalog.class);
+    // kuduTable工厂类
     private final KuduTableFactory tableFactory = new KuduTableFactory();
     private final String kuduMasters;
     private KuduClient kuduClient;
@@ -114,7 +114,8 @@ public class KuduCatalog extends AbstractReadOnlyCatalog {
     }
 
     @Override
-    public void open() {}
+    public void open() {
+    }
 
     @Override
     public void close() {
@@ -140,6 +141,7 @@ public class KuduCatalog extends AbstractReadOnlyCatalog {
         }
 
         try {
+            // 调用原生kudu 客户端
             return kuduClient.getTablesList().getTablesList();
         } catch (Throwable t) {
             throw new CatalogException("Could not list tables", t);
@@ -156,6 +158,11 @@ public class KuduCatalog extends AbstractReadOnlyCatalog {
         }
     }
 
+    /**
+     * @param tablePath databaseName.tableName
+     * @return
+     * @throws TableNotExistException
+     */
     @Override
     public CatalogTable getTable(ObjectPath tablePath) throws TableNotExistException {
         checkNotNull(tablePath);
@@ -167,24 +174,36 @@ public class KuduCatalog extends AbstractReadOnlyCatalog {
         String tableName = tablePath.getObjectName();
 
         try {
+            // 打开kudu table
             KuduTable kuduTable = kuduClient.openTable(tableName);
-
-            CatalogTableImpl table = new CatalogTableImpl(
+            // 将kudu table封装为flink catalogTable
+            return new CatalogTableImpl(
+                    // 将kudu schema转换为flink schema
                     KuduTableUtils.kuduToFlinkSchema(kuduTable.getSchema()),
+                    // 构建table参数
                     createTableProperties(tableName, kuduTable.getSchema().getPrimaryKeyColumns()),
                     tableName);
-
-            return table;
         } catch (KuduException e) {
             throw new CatalogException(e);
         }
     }
 
+    /**
+     * 创建table属性
+     *
+     * @param tableName         表名
+     * @param primaryKeyColumns 主键列
+     * @return
+     */
     protected Map<String, String> createTableProperties(String tableName, List<ColumnSchema> primaryKeyColumns) {
         Map<String, String> props = new HashMap<>();
+        // kudu master
         props.put(KuduTableFactory.KUDU_MASTERS, kuduMasters);
+        // 主键列拼接
         String primaryKeyNames = primaryKeyColumns.stream().map(ColumnSchema::getName).collect(Collectors.joining(","));
+        // 主键列
         props.put(KuduTableFactory.KUDU_PRIMARY_KEY_COLS, primaryKeyNames);
+        // 表名
         props.put(KuduTableFactory.KUDU_TABLE, tableName);
         return props;
     }
@@ -217,6 +236,14 @@ public class KuduCatalog extends AbstractReadOnlyCatalog {
         }
     }
 
+    /**
+     * 创建table
+     *
+     * @param tableInfo      table信息包含tableName，CreateTableOptionsFactory、ColumnSchemasFactory等，用于创建Schema和CreateTableOptions
+     * @param ignoreIfExists
+     * @throws CatalogException
+     * @throws TableAlreadyExistException
+     */
     public void createTable(KuduTableInfo tableInfo, boolean ignoreIfExists) throws CatalogException, TableAlreadyExistException {
         ObjectPath path = getObjectPath(tableInfo.getName());
         if (tableExists(path)) {
@@ -228,6 +255,7 @@ public class KuduCatalog extends AbstractReadOnlyCatalog {
         }
 
         try {
+            // 创建表
             kuduClient.createTable(tableInfo.getName(), tableInfo.getSchema(), tableInfo.getCreateTableOptions());
         } catch (
                 KuduException e) {
@@ -252,7 +280,9 @@ public class KuduCatalog extends AbstractReadOnlyCatalog {
                     requiredProperties.toString());
         }
 
+        // 必须、可选参数合并
         Set<String> permittedProperties = Sets.union(requiredProperties, optionalProperties);
+        // 校验tableProperties中是否包含全部参数
         if (!permittedProperties.containsAll(tableProperties.keySet())) {
             throw new CatalogException("Unpermitted properties were given. The following properties are allowed:" +
                     permittedProperties.toString());
@@ -260,8 +290,10 @@ public class KuduCatalog extends AbstractReadOnlyCatalog {
 
         String tableName = tablePath.getObjectName();
 
+        // 构建底层KuduTableInfo
         KuduTableInfo tableInfo = KuduTableUtils.createTableInfo(tableName, tableSchema, tableProperties);
 
+        // 创建表
         createTable(tableInfo, ignoreIfExists);
     }
 

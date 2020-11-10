@@ -30,10 +30,16 @@ import org.apache.flink.table.sinks.UpsertStreamTableSink;
 import org.apache.flink.table.utils.TableConnectorUtils;
 import org.apache.flink.types.Row;
 
+/**
+ * 实现UpsertStreamTableSink upsert流
+ */
 public class KuduTableSink implements UpsertStreamTableSink<Row> {
 
+    // 写入配置构造器
     private final KuduWriterConfig.Builder writerConfigBuilder;
+    // TableSchema
     private final TableSchema flinkSchema;
+    // kudu table配置包含schema、tableName、表参数
     private final KuduTableInfo tableInfo;
 
     public KuduTableSink(KuduWriterConfig.Builder configBuilder, KuduTableInfo tableInfo, TableSchema flinkSchema) {
@@ -48,13 +54,24 @@ public class KuduTableSink implements UpsertStreamTableSink<Row> {
     @Override
     public void setIsAppendOnly(Boolean isAppendOnly) { /* this has no effect */}
 
+    /**
+     * 获取记录类型
+     * @return
+     */
     @Override
     public TypeInformation<Row> getRecordType() { return flinkSchema.toRowType(); }
 
+    /**
+     * 消费数据流
+     * @param dataStreamTuple
+     * @return
+     */
     @Override
     public DataStreamSink<?> consumeDataStream(DataStream<Tuple2<Boolean, Row>> dataStreamTuple) {
+        // 创建kuduSink
         KuduSink upsertKuduSink = new KuduSink(writerConfigBuilder.build(), tableInfo, new UpsertOperationMapper(getTableSchema().getFieldNames()));
 
+        // 调用底层DataStream
         return dataStreamTuple
                 .addSink(upsertKuduSink)
                 .setParallelism(dataStreamTuple.getParallelism())

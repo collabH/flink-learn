@@ -44,6 +44,7 @@ import org.apache.flink.table.catalog.stats.CatalogTableStatistics;
 
 /**
  * Read-only catalog.
+ * 只读catalog
  */
 @Internal
 public abstract class AbstractReadOnlyCatalog extends AbstractCatalog {
