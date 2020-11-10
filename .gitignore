@@ -27,3 +27,9 @@ hs_err_pid*
 .idea
 target/*
 flink-learn.iml
+flink-connector-flume/target/**
+flink-connector-flume/flink-connector-flume_2.11.iml
+flink-connector-kudu/flink-connector-kudu_2.11.iml
+flink-connector-kudu/target/**
+flink-connector-redis/target/**
+flink-connector-redis/flink-connector-redis_2.11.iml
