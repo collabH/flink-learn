@@ -23,7 +23,10 @@ under the License.
     <groupId>dev.learn.flink</groupId>
     <artifactId>flink-learn</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <modules>
+        <module>application-mode</module>
+    </modules>
+    <packaging>pom</packaging>
 
     <name>Flink Quickstart Job</name>
 
@@ -246,6 +249,11 @@ under the License.
             <version>${jmh.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-yarn_2.11</artifactId>
+            <version>1.11.1</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -299,7 +307,7 @@ under the License.
                             <transformers>
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>dev.learn.flink.StreamingJob</mainClass>
+                                    <mainClass>dev.learn.TestApplicationMode</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>
