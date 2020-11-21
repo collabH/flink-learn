@@ -3,11 +3,13 @@ package dev.learn.flink.window;
 import dev.learn.flink.function.SplitFunction;
 import dev.learn.flink.function.SumReduceFunction;
 import dev.learn.flink.function.WordCountMapFunction;
+import org.apache.flink.api.common.typeutils.base.IntSerializer;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.assigners.GlobalWindows;
+import org.apache.flink.streaming.api.windowing.triggers.DeltaTrigger;
 
 /**
  * @fileName: UseWindowFunction.java
@@ -45,5 +47,20 @@ public class UseWindowFunction {
 
 
         env.execute();
+    }
+
+    public void deltaTrigger() {
+        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+
+        env.fromElements(1, 2, 3, 4, 5)
+                .keyBy(new KeySelector<Integer, Integer>() {
+                    @Override
+                    public Integer getKey(Integer value) throws Exception {
+                        return value;
+                    }
+                }).window(GlobalWindows.create())
+                .trigger(DeltaTrigger.of(10000, (oldDataPoint, newDataPoint) -> {
+                    return newDataPoint - oldDataPoint;
+                }, IntSerializer.INSTANCE)).max(1);
     }
 }

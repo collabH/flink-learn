@@ -1,4 +1,4 @@
-package dev.learn.flink.trigger;
+package dev.learn.flink.window.trigger;
 
 import org.apache.flink.streaming.api.windowing.triggers.Trigger;
 import org.apache.flink.streaming.api.windowing.triggers.TriggerResult;
@@ -9,20 +9,23 @@ class MyTrigger extends Trigger<String, TimeWindow> {
 
     /**
      * 每来一条数据做什么操作
-     * @param element 数据
+     *
+     * @param element   数据
      * @param timestamp 时间时间戳
-     * @param window 时间窗口
-     * @param ctx 触发器上下文
+     * @param window    时间窗口
+     * @param ctx       触发器上下文
      * @return
      * @throws Exception
      */
     @Override
     public TriggerResult onElement(String element, long timestamp, TimeWindow window, TriggerContext ctx) throws Exception {
+        // fire_and_purge 计算窗口并且清楚中间状态
         return TriggerResult.FIRE_AND_PURGE;
     }
 
     /**
      * prcoessing时间变化做的操作
+     *
      * @param time
      * @param window
      * @param ctx
@@ -37,6 +40,7 @@ class MyTrigger extends Trigger<String, TimeWindow> {
 
     /**
      * waterMark变化做的操作
+     *
      * @param time
      * @param window
      * @param ctx
