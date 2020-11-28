@@ -1,10 +1,14 @@
 package dev.learn.flink.tablesql;
 
-import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.table.api.DataTypes;
 import org.apache.flink.table.api.EnvironmentSettings;
+import org.apache.flink.table.api.ExplainDetail;
+import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.TableEnvironment;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
+
+import java.util.Arrays;
 
 /**
  * @fileName: UseTableEnvironment.java
@@ -20,12 +24,27 @@ public class UseTableEnvironment {
                 .inStreamingMode()
                 .useBlinkPlanner()
                 .build();
-        StreamTableEnvironment tableEnvironment = StreamTableEnvironment.create(env,settings);
+        StreamTableEnvironment tableEnvironment = StreamTableEnvironment.create(env, settings);
 
         // create batch execute environment
-        EnvironmentSettings batchSettings= EnvironmentSettings.newInstance()
+        EnvironmentSettings batchSettings = EnvironmentSettings.newInstance()
                 .inBatchMode().useBlinkPlanner().build();
-        TableEnvironment.create(batchSettings);
+        TableEnvironment tableEnvironment1 = TableEnvironment.create(batchSettings);
+
+
+        Table table = tableEnvironment.fromValues(DataTypes.ROW(DataTypes.FIELD("id", DataTypes.INT().notNull())), 1, 2, 3, 4, 5);
+
+        tableEnvironment.createTemporaryView("test", table);
+
+        tableEnvironment.executeSql("select * from test").print();
+        tableEnvironment.from("test").execute().print();
+        System.out.println(Arrays.toString(tableEnvironment.listCatalogs()));
+        System.out.println(Arrays.toString(tableEnvironment.listModules()));
+        System.out.println(Arrays.toString(tableEnvironment.listTables()));
+        System.out.println(Arrays.toString(tableEnvironment.listViews()));
+        System.out.println(Arrays.toString(tableEnvironment.listTemporaryTables()));
+        System.out.println(Arrays.toString(tableEnvironment.listTemporaryViews()));
+        System.out.println(tableEnvironment.explainSql("select * from test", ExplainDetail.ESTIMATED_COST));
 
 
     }

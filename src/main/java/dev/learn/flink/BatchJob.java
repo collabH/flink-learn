@@ -23,6 +23,8 @@ import dev.learn.flink.function.SumReduceFunction;
 import dev.learn.flink.function.WordCountMapFunction;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.operators.DataSource;
+import org.apache.flink.api.java.operators.ReduceOperator;
+import org.apache.flink.api.java.tuple.Tuple2;
 
 /**
  * Skeleton for a Flink Batch Job.
@@ -68,12 +70,11 @@ public class BatchJob {
                 "flink",
                 "flink"
         ));
-        dataSource.map(new WordCountMapFunction())
+         dataSource.map(new WordCountMapFunction())
                 .groupBy(0)
-                .reduce(new SumReduceFunction())
-                .print();
-        System.out.println(env.getExecutionPlan());
+                .reduce(new SumReduceFunction()).print();
 
+        System.out.println(dataSource.count());
         env.execute("Flink Batch Java API Skeleton");
     }
 }
