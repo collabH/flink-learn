@@ -22,9 +22,11 @@ import dev.learn.flink.function.SumReduceFunction;
 import dev.learn.flink.function.WordCountMapFunction;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
+import org.apache.flink.streaming.api.functions.co.CoProcessFunction;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.util.Collector;
 
@@ -47,6 +49,19 @@ public class StreamingJob {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         DataStreamSource<String> datasource = env.socketTextStream("hadoop", 10089);
 
+        DataStream<String> broadcast = datasource.broadcast();
+        
+        datasource.connect(broadcast).process(new CoProcessFunction<String, String, String>() {
+            @Override
+            public void processElement1(String value, Context ctx, Collector<String> out) throws Exception {
+                out.collect("1:"+value);
+            }
+
+            @Override
+            public void processElement2(String value, Context ctx, Collector<String> out) throws Exception {
+                out.collect("2:"+value);
+            }
+        }).print();
 
         datasource.uid("network-source").map(new WordCountMapFunction())
                 .slotSharingGroup("a")
