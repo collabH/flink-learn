@@ -10,11 +10,12 @@ import org.apache.flink.api.java.ExecutionEnvironment;
  */
 public class TestApplicationMode {
     public static void main(String[] args) throws Exception {
-        ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-
-        env.fromElements(1, 2, 3, 4, 5, 6, 7)
-                .print();
-
-        env.execute();
+        System.out.println(System.currentTimeMillis());
+//        ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
+//
+//        env.fromElements(1, 2, 3, 4, 5, 6, 7)
+//                .print();
+//
+//        env.execute();
     }
 }
