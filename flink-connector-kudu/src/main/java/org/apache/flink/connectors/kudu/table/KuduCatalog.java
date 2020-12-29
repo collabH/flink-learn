@@ -62,7 +62,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.apache.flink.connectors.kudu.table.KuduTableFactory.KUDU_HASH_COLS;
+import static org.apache.flink.connectors.kudu.table.KuduTableFactory.KUDU_HASH_PARTITION_NUMS;
+import static org.apache.flink.connectors.kudu.table.KuduTableFactory.KUDU_IS_CREATE_TABLE;
 import static org.apache.flink.connectors.kudu.table.KuduTableFactory.KUDU_PRIMARY_KEY_COLS;
+import static org.apache.flink.connectors.kudu.table.KuduTableFactory.KUDU_RANGE_PARTITION_RULE;
 import static org.apache.flink.connectors.kudu.table.KuduTableFactory.KUDU_REPLICAS;
 import static org.apache.flink.util.Preconditions.checkArgument;
 import static org.apache.flink.util.Preconditions.checkNotNull;
@@ -268,8 +271,8 @@ public class KuduCatalog extends AbstractReadOnlyCatalog {
         Map<String, String> tableProperties = table.getProperties();
         TableSchema tableSchema = table.getSchema();
 
-        Set<String> optionalProperties = new HashSet<>(Arrays.asList(KUDU_REPLICAS));
-        Set<String> requiredProperties = new HashSet<>(Arrays.asList(KUDU_HASH_COLS));
+        Set<String> optionalProperties = new HashSet<>(Arrays.asList(KUDU_REPLICAS, KUDU_HASH_PARTITION_NUMS, KUDU_RANGE_PARTITION_RULE, KUDU_HASH_COLS));
+        Set<String> requiredProperties = new HashSet<>(Arrays.asList(KUDU_IS_CREATE_TABLE));
 
         if (!tableSchema.getPrimaryKey().isPresent()) {
             requiredProperties.add(KUDU_PRIMARY_KEY_COLS);

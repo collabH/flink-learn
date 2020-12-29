@@ -17,6 +17,8 @@
 
 package org.apache.flink.connectors.kudu.table.utils;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.connectors.kudu.connector.ColumnSchemasFactory;
 import org.apache.flink.connectors.kudu.connector.CreateTableOptionsFactory;
@@ -41,30 +43,40 @@ import org.apache.kudu.ColumnSchema;
 import org.apache.kudu.ColumnTypeAttributes;
 import org.apache.kudu.Schema;
 import org.apache.kudu.client.CreateTableOptions;
+import org.apache.kudu.client.PartialRow;
+import org.apache.kudu.client.RangePartitionBound;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import java.math.BigDecimal;
+import java.nio.charset.Charset;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.apache.flink.connectors.kudu.table.KuduTableFactory.KUDU_HASH_COLS;
+import static org.apache.flink.connectors.kudu.table.KuduTableFactory.KUDU_HASH_PARTITION_NUMS;
+import static org.apache.flink.connectors.kudu.table.KuduTableFactory.KUDU_IS_CREATE_TABLE;
 import static org.apache.flink.connectors.kudu.table.KuduTableFactory.KUDU_PRIMARY_KEY_COLS;
+import static org.apache.flink.connectors.kudu.table.KuduTableFactory.KUDU_RANGE_PARTITION_RULE;
 
 public class KuduTableUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(KuduTableUtils.class);
 
     public static KuduTableInfo createTableInfo(String tableName, TableSchema schema, Map<String, String> props) {
-        // Since KUDU_HASH_COLS is a required property for table creation, we use it to infer whether to create table
-        boolean createIfMissing = props.containsKey(KUDU_HASH_COLS);
-
+        // 是否创建table，默认为创建
+        boolean createIfMissing = Boolean.parseBoolean(props.getOrDefault(KUDU_IS_CREATE_TABLE, "true"));
+        boolean isHashPartition = props.containsKey(KUDU_HASH_COLS);
+        boolean isRangePartition = props.containsKey(KUDU_RANGE_PARTITION_RULE);
         KuduTableInfo tableInfo = KuduTableInfo.forTable(tableName);
 
         if (createIfMissing) {
@@ -77,13 +89,26 @@ public class KuduTableUtils {
 
             List<String> keyColumns = getPrimaryKeyColumns(props, schema);
             ColumnSchemasFactory schemasFactory = () -> toKuduConnectorColumns(columns, keyColumns);
-            List<String> hashColumns = getHashColumns(props);
             int replicas = Optional.ofNullable(props.get(KuduTableFactory.KUDU_REPLICAS)).map(Integer::parseInt).orElse(1);
-
-            CreateTableOptionsFactory optionsFactory = () -> new CreateTableOptions()
-                    .setNumReplicas(replicas)
-                    .addHashPartitions(hashColumns, replicas * 2);
-
+            // if hash partitions nums not exists,default 1;
+            int hashPartitionNums = Optional.ofNullable(props.get(KUDU_HASH_PARTITION_NUMS)).map(Integer::parseInt).orElse(3);
+            CreateTableOptionsFactory optionsFactory = () -> {
+                CreateTableOptions createTableOptions = new CreateTableOptions()
+                        .setNumReplicas(replicas);
+                if (isHashPartition) {
+                    createTableOptions
+                            .addHashPartitions(getHashColumns(props), hashPartitionNums);
+                }
+                // build rangePartition
+                if (isRangePartition) {
+                    buildRangePartition(createTableOptions, props, keyColumns, schemasFactory);
+                }
+                // 如果没有显式指定hash和range分区，则设置主键为range分区
+                if (!isRangePartition && !isHashPartition) {
+                    createTableOptions.setRangePartitionColumns(keyColumns);
+                }
+                return createTableOptions;
+            };
             tableInfo.createTableIfNotExists(schemasFactory, optionsFactory);
         } else {
             LOG.debug("Property {} is missing, assuming the table is already created.", KUDU_HASH_COLS);
@@ -99,12 +124,12 @@ public class KuduTableUtils {
                                     .ColumnSchemaBuilder(t.f0, KuduTypeUtils.toKuduType(t.f1))
                                     .key(keyColumns.contains(t.f0))
                                     .nullable(!keyColumns.contains(t.f0) && t.f1.getLogicalType().isNullable());
-                            if(t.f1.getLogicalType() instanceof DecimalType) {
+                            if (t.f1.getLogicalType() instanceof DecimalType) {
                                 DecimalType decimalType = ((DecimalType) t.f1.getLogicalType());
                                 builder.typeAttributes(new ColumnTypeAttributes.ColumnTypeAttributesBuilder()
-                                    .precision(decimalType.getPrecision())
-                                    .scale(decimalType.getScale())
-                                    .build());
+                                        .precision(decimalType.getPrecision())
+                                        .scale(decimalType.getScale())
+                                        .build());
                             }
                             return builder.build();
                         }
@@ -124,6 +149,107 @@ public class KuduTableUtils {
 
     public static List<String> getPrimaryKeyColumns(Map<String, String> tableProperties, TableSchema tableSchema) {
         return tableProperties.containsKey(KUDU_PRIMARY_KEY_COLS) ? Arrays.asList(tableProperties.get(KUDU_PRIMARY_KEY_COLS).split(",")) : tableSchema.getPrimaryKey().get().getColumns();
+    }
+
+    /**
+     * 构造range分区
+     * 格式为:id#100,200#true,true:id#200,300#false,false
+     *
+     * @param createTableOptions
+     * @param tableProperties
+     */
+    public static void buildRangePartition(CreateTableOptions createTableOptions, Map<String, String> tableProperties, List<String> primaryKeys, ColumnSchemasFactory schemasFactory) {
+        String rangePartitionRule = tableProperties.get(KUDU_RANGE_PARTITION_RULE);
+        String[] ruleArr = rangePartitionRule.split(":");
+        Set<String> rangeKeys = new HashSet<>();
+        for (String rule : ruleArr) {
+            String[] rangeRule = rule.split("#");
+            if (ArrayUtils.isEmpty(rangeRule) || rangeRule.length != 2) {
+                throw new IllegalArgumentException("range参数异常,正确格式为: rangeKey#leftValue,rightValue#leftBound,rightBound:rangeKey#leftValue,rightValue#leftBound,rightBound ");
+            }
+            String rangeKey = rangeRule[0];
+            if (!primaryKeys.contains(rangeKey)) {
+                throw new IllegalArgumentException("rangeKey必须从primary key中选择");
+            }
+            rangeKeys.add(rangeKey);
+            String[] rangeValues = rangeRule[1].split(",");
+            if (ArrayUtils.isEmpty(rangeValues)) {
+                throw new IllegalArgumentException("rangeValues不能为空");
+            }
+            PartialRow lowerRow = new PartialRow(new Schema(schemasFactory.getColumnSchemas()));
+            PartialRow upperRow = new PartialRow(new Schema(schemasFactory.getColumnSchemas()));
+            // 封装分区范围
+            if (rangeValues.length == 2) {
+                String leftVal = rangeValues[0];
+                String rightVal = rangeValues[1];
+                if (StringUtils.isNotEmpty(leftVal) && StringUtils.isNotEmpty(rightVal)) {
+                    if (leftVal.compareTo(rightVal) > 0) {
+                        throw new IllegalArgumentException("leftValue不能大于rightValue");
+                    }
+                }
+                if (StringUtils.isNotEmpty(leftVal)) {
+                    buildRangeRow(schemasFactory.getColumnSchemas(), rangeKey, lowerRow, leftVal);
+                }
+                if (StringUtils.isNotEmpty(rightVal)) {
+                    buildRangeRow(schemasFactory.getColumnSchemas(), rangeKey, upperRow, rightVal);
+                }
+            } else if (rangeValues.length == 1) {
+                String leftVal = rangeValues[0];
+                if (StringUtils.isNotEmpty(leftVal)) {
+                    buildRangeRow(schemasFactory.getColumnSchemas(), rangeKey, lowerRow, leftVal);
+                }
+            }
+            createTableOptions.addRangePartition(lowerRow, upperRow, RangePartitionBound.INCLUSIVE_BOUND, RangePartitionBound.EXCLUSIVE_BOUND);
+        }
+        List<String> ranges = new ArrayList<>(rangeKeys);
+        createTableOptions.setRangePartitionColumns(ranges);
+    }
+
+    /**
+     * 构建分区行
+     *
+     * @param columnSchemaList
+     * @param rangeKey
+     * @return
+     */
+    private static void buildRangeRow(List<ColumnSchema> columnSchemaList, String rangeKey, PartialRow row, String val) {
+        for (ColumnSchema columnSchema : columnSchemaList) {
+            if (rangeKey.equals(columnSchema.getName())) {
+                switch (columnSchema.getType()) {
+                    case BOOL:
+                        row.addBoolean(rangeKey, Boolean.parseBoolean(val));
+                        break;
+                    case INT16:
+                    case INT32:
+                    case INT8:
+                        row.addInt(rangeKey, Integer.parseInt(val));
+                        break;
+                    case INT64:
+                        row.addLong(rangeKey, Long.parseLong(val));
+                        break;
+                    case STRING:
+                        row.addString(rangeKey, val);
+                        break;
+                    case FLOAT:
+                        row.addFloat(rangeKey, Float.parseFloat(val));
+                        break;
+                    case BINARY:
+                        row.addBinary(rangeKey, val.getBytes(Charset.defaultCharset()));
+                        break;
+                    case DOUBLE:
+                        row.addDouble(rangeKey, Double.parseDouble(val));
+                        break;
+                    case DECIMAL:
+                        row.addDecimal(rangeKey, BigDecimal.valueOf(Long.parseLong(val)));
+                        break;
+                    case UNIXTIME_MICROS:
+                        row.addTimestamp(rangeKey, new Timestamp(Long.parseLong(val)));
+                        break;
+                    default:
+                        throw new RuntimeException("该kudu类型不支持!");
+                }
+            }
+        }
     }
 
     public static List<String> getHashColumns(Map<String, String> tableProperties) {
