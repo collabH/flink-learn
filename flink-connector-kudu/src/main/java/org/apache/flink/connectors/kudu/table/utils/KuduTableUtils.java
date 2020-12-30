@@ -58,6 +58,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -73,8 +74,8 @@ public class KuduTableUtils {
     private static final Logger LOG = LoggerFactory.getLogger(KuduTableUtils.class);
 
     public static KuduTableInfo createTableInfo(String tableName, TableSchema schema, Map<String, String> props) {
-        // 是否创建table，默认为创建
-        boolean createIfMissing = Boolean.parseBoolean(props.getOrDefault(KUDU_IS_CREATE_TABLE, "true"));
+        // kudu主键或者table主键存在即新创建tableInfo
+        boolean createIfMissing = props.containsKey(KUDU_PRIMARY_KEY_COLS)|| Objects.nonNull(schema.getPrimaryKey());
         boolean isHashPartition = props.containsKey(KUDU_HASH_COLS);
         boolean isRangePartition = props.containsKey(KUDU_RANGE_PARTITION_RULE);
         KuduTableInfo tableInfo = KuduTableInfo.forTable(tableName);

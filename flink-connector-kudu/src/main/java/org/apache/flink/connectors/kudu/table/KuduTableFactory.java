@@ -64,7 +64,6 @@ public class KuduTableFactory implements TableSourceFactory<Row>, TableSinkFacto
      * Flink SQL的TableProperties中需要配置的json的key
      */
     public static final String KUDU_TABLE = "kudu.table";
-    public static final String KUDU_IS_CREATE_TABLE = "kudu.is_create_table";
     public static final String KUDU_MASTERS = "kudu.masters";
     public static final String KUDU_HASH_COLS = "kudu.hash-columns";
     public static final String KUDU_HASH_PARTITION_NUMS = "kudu.hash-partition-nums";
@@ -89,7 +88,6 @@ public class KuduTableFactory implements TableSourceFactory<Row>, TableSinkFacto
         properties.add(KUDU_PRIMARY_KEY_COLS);
         properties.add(KUDU_HASH_PARTITION_NUMS);
         properties.add(KUDU_RANGE_PARTITION_RULE);
-        properties.add(KUDU_IS_CREATE_TABLE);
         // schema
         properties.add(SCHEMA + ".#." + SCHEMA_DATA_TYPE);
         properties.add(SCHEMA + ".#." + SCHEMA_TYPE);
