@@ -21,6 +21,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.connectors.kudu.connector.KuduTableInfo;
 import org.apache.flink.connectors.kudu.connector.reader.KuduReaderConfig;
 import org.apache.flink.connectors.kudu.connector.writer.KuduWriterConfig;
+import org.apache.flink.connectors.kudu.table.lookup.KuduLookupOptions;
 import org.apache.flink.connectors.kudu.table.utils.KuduTableUtils;
 import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.table.catalog.CatalogTable;
@@ -70,7 +71,14 @@ public class KuduTableFactory implements TableSourceFactory<Row>, TableSinkFacto
     public static final String KUDU_RANGE_PARTITION_RULE = "kudu.range-partition-rule";
     public static final String KUDU_PRIMARY_KEY_COLS = "kudu.primary-key-columns";
     public static final String KUDU_REPLICAS = "kudu.replicas";
+    public static final String KUDU_SCAN_ROW_SIZE = "kudu.scan.row-size";
     public static final String KUDU = "kudu";
+
+
+    public static final String KUDU_LOOKUP_CACHE_MAX_ROWS = "kudu.lookup.cache.max-rows";
+    public static final String KUDU_LOOKUP_CACHE_TTL = "kudu.lookup.cache.ttl";
+    public static final String KUDU_LOOKUP_MAX_RETRIES = "kudu.lookup.max-retries";
+
 
     @Override
     public Map<String, String> requiredContext() {
@@ -88,6 +96,12 @@ public class KuduTableFactory implements TableSourceFactory<Row>, TableSinkFacto
         properties.add(KUDU_PRIMARY_KEY_COLS);
         properties.add(KUDU_HASH_PARTITION_NUMS);
         properties.add(KUDU_RANGE_PARTITION_RULE);
+        properties.add(KUDU_SCAN_ROW_SIZE);
+
+        //lookup
+        properties.add(KUDU_LOOKUP_CACHE_MAX_ROWS);
+        properties.add(KUDU_LOOKUP_CACHE_TTL);
+        properties.add(KUDU_LOOKUP_MAX_RETRIES);
         // schema
         properties.add(SCHEMA + ".#." + SCHEMA_DATA_TYPE);
         properties.add(SCHEMA + ".#." + SCHEMA_TYPE);
@@ -133,13 +147,28 @@ public class KuduTableFactory implements TableSourceFactory<Row>, TableSinkFacto
 
     private KuduTableSource createTableSource(String tableName, TableSchema schema, Map<String, String> props) {
         String masterAddresses = props.get(KUDU_MASTERS);
+        // 默认为0，表示拉取最大的数据量
+        int scanRowSize = Integer.parseInt(props.getOrDefault(KUDU_SCAN_ROW_SIZE, "0"));
+        long kuduCacheMaxRows = Long.parseLong(props.getOrDefault(KUDU_LOOKUP_CACHE_MAX_ROWS, "-1"));
+        long kuduCacheTtl = Long.parseLong(props.getOrDefault(KUDU_LOOKUP_CACHE_TTL, "-1"));
+        // kudu重试次数，默认为3次
+        int kuduMaxReties = Integer.parseInt(props.getOrDefault(KUDU_LOOKUP_MAX_RETRIES, "3"));
+
+        // 构造kudu lookup options
+        KuduLookupOptions kuduLookupOptions = KuduLookupOptions.Builder.options().withCacheMaxSize(kuduCacheMaxRows)
+                .withCacheExpireMs(kuduCacheTtl)
+                .withMaxRetryTimes(kuduMaxReties)
+                .build();
+
+
         TableSchema physicalSchema = KuduTableUtils.getSchemaWithSqlTimestamp(schema);
         KuduTableInfo tableInfo = KuduTableUtils.createTableInfo(tableName, schema, props);
 
         KuduReaderConfig.Builder configBuilder = KuduReaderConfig.Builder
-                .setMasters(masterAddresses);
+                .setMasters(masterAddresses)
+                .setRowLimit(scanRowSize);
 
-        return new KuduTableSource(configBuilder, tableInfo, physicalSchema, null, null);
+        return new KuduTableSource(configBuilder, tableInfo, physicalSchema, null, null, kuduLookupOptions);
     }
 
     @Override

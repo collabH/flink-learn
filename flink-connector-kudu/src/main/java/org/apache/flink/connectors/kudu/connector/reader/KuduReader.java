@@ -16,11 +16,10 @@
  */
 package org.apache.flink.connectors.kudu.connector.reader;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.flink.annotation.Internal;
 import org.apache.flink.connectors.kudu.connector.KuduFilterInfo;
 import org.apache.flink.connectors.kudu.connector.KuduTableInfo;
-
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.kudu.client.KuduClient;
 import org.apache.kudu.client.KuduScanToken;
 import org.apache.kudu.client.KuduSession;
@@ -52,8 +51,8 @@ public class KuduReader implements AutoCloseable {
     /**
      * kudu表过滤信息
      */
-    private final List<KuduFilterInfo> tableFilters;
-    private final List<String> tableProjections;
+    private List<KuduFilterInfo> tableFilters;
+    private List<String> tableProjections;
 
     private transient KuduClient client;
     private transient KuduSession session;
@@ -65,6 +64,14 @@ public class KuduReader implements AutoCloseable {
 
     public KuduReader(KuduTableInfo tableInfo, KuduReaderConfig readerConfig, List<KuduFilterInfo> tableFilters) throws IOException {
         this(tableInfo, readerConfig, tableFilters, null);
+    }
+
+    public void setTableFilters(List<KuduFilterInfo> tableFilters) {
+        this.tableFilters = tableFilters;
+    }
+
+    public void setTableProjections(List<String> tableProjections) {
+        this.tableProjections = tableProjections;
     }
 
     public KuduReader(KuduTableInfo tableInfo, KuduReaderConfig readerConfig, List<KuduFilterInfo> tableFilters, List<String> tableProjections) throws IOException {
