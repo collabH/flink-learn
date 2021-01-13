@@ -20,7 +20,7 @@ public class CreateViewOpeartor {
         StreamTableEnvironment env = StreamEnvironment.getEnv(executionEnvironment);
 
         Table table = env.fromValues(DataTypes.ROW(DataTypes.FIELD("id", DataTypes.INT().notNull()),
-                DataTypes.FIELD("name", DatfaTypes.VARCHAR(64).notNull())), row(1, "hsm"), row(2, "zs"));
+                DataTypes.FIELD("name", DataTypes.VARCHAR(64).notNull())), row(1, "hsm"), row(2, "zs"));
 
         env.executeSql("create view test_view(id,name) as select id,name from " + table);
         env.executeSql("select * from test_view").print();
