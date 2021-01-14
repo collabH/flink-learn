@@ -4,10 +4,12 @@ import dev.learn.flink.tablesql.table.StreamEnvironment;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.SqlDialect;
 import org.apache.flink.table.api.Table;
+import org.apache.flink.table.api.TableEnvironment;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.table.catalog.hive.HiveCatalog;
 
 import static org.apache.flink.table.api.Expressions.$;
+import static org.apache.flink.table.api.Expressions.e;
 
 /**
  * @fileName: QueryOperate.java
@@ -41,5 +43,14 @@ public class QueryOperate {
 
         test_ext.printSchema();
         test_ext.execute().print();
+        // group by
+        env.executeSql("select count(id) as cn from test_ext group by id").print();
+
+        // over window
+//        env.executeSql("select rn from(select row_number()over(partition by id order by id) as rn from test_ext)").print();
+
+        // drop operate
+        env.executeSql("drop table test_ext");
+        env.executeSql("drop database for_ods");
     }
 }
