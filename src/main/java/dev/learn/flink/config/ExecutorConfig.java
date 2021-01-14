@@ -36,8 +36,8 @@ public class ExecutorConfig {
         config.disableObjectReuse();
 
         // 开启JobManager状态system.out.print日志
-        config.enableSysoutLogging();
-        config.disableSysoutLogging();
+//        config.enableSysoutLogging();
+//        config.disableSysoutLogging();
 
         // 设置全局Job参数
 //        config.setGlobalJobParameters();

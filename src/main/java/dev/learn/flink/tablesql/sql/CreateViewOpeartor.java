@@ -6,6 +6,9 @@ import org.apache.flink.table.api.DataTypes;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 
+import static org.apache.flink.table.api.Expressions.$;
+import static org.apache.flink.table.api.Expressions.concat;
+import static org.apache.flink.table.api.Expressions.e;
 import static org.apache.flink.table.api.Expressions.row;
 
 /**
@@ -24,5 +27,10 @@ public class CreateViewOpeartor {
 
         env.executeSql("create view test_view(id,name) as select id,name from " + table);
         env.executeSql("select * from test_view").print();
+
+        env.createTemporaryView("test",table);
+        env.sqlQuery("select * from test")
+                .addColumns(concat($("id"),"aa").as("hh"))
+                .execute().print();
     }
 }

@@ -29,17 +29,17 @@ public class MutilStreamOperator {
 
         // 分流
 
-        datasource.split(new OutputSelector<Tuple2<String, Integer>>() {
-            @Override
-            public Iterable<String> select(Tuple2<String, Integer> data) {
-                if ("a".equals(data.f0)) {
-                    return Lists.newArrayList("high");
-                } else {
-                    return Lists.newArrayList("low");
-                }
-            }
-        }).select("high")
-                .print("high");
+//        datasource.split(new OutputSelector<Tuple2<String, Integer>>() {
+//            @Override
+//            public Iterable<String> select(Tuple2<String, Integer> data) {
+//                if ("a".equals(data.f0)) {
+//                    return Lists.newArrayList("high");
+//                } else {
+//                    return Lists.newArrayList("low");
+//                }
+//            }
+//        }).select("high")
+//                .print("high");
 
         // 合流
         datasource.connect(datasource1)
