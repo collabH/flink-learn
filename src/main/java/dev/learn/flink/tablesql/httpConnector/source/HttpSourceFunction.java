@@ -10,6 +10,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.source.RichSourceFunction;
 import org.apache.flink.table.data.RowData;
@@ -22,7 +24,7 @@ import java.util.Objects;
  * @author: by echo huang
  * @date: 2021/1/17 11:44 下午
  */
-public class HttpSourceFunction extends RichSourceFunction<RowData> {
+public class HttpSourceFunction extends RichSourceFunction<RowData> implements ResultTypeQueryable<RowData> {
     private final RequestParamOptions requestParamOptions;
     private final ConnectionOptions connectionOptions;
     private final HttpClientOptions httpClientOptions;
@@ -82,5 +84,10 @@ public class HttpSourceFunction extends RichSourceFunction<RowData> {
     public void cancel() {
         isRunning = false;
         httpClient = null;
+    }
+
+    @Override
+    public TypeInformation<RowData> getProducedType() {
+        return deserializer.getProducedType();
     }
 }
