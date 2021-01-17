@@ -1,2 +1,3 @@
 dev.learn.flink.tablesql.httpConnector.sink.HttpTableSinkFactory
 dev.learn.flink.tablesql.httpConnector.source.HttpTableSourceFactory
+dev.learn.flink.tablesql.httpConnector.deserializer.HttpRequestFormatFactory

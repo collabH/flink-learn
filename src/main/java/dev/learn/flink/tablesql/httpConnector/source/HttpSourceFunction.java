@@ -5,6 +5,7 @@ import dev.learn.flink.tablesql.httpConnector.options.ConnectionOptions;
 import dev.learn.flink.tablesql.httpConnector.options.HttpClientOptions;
 import dev.learn.flink.tablesql.httpConnector.options.RequestParamOptions;
 import dev.learn.utils.http.OkHttpClientUtils;
+import okhttp3.Call;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import org.apache.commons.lang3.ArrayUtils;
@@ -12,6 +13,8 @@ import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.source.RichSourceFunction;
 import org.apache.flink.table.data.RowData;
+
+import java.util.Objects;
 
 /**
  * @fileName: HttpSourceFunction.java
@@ -25,6 +28,7 @@ public class HttpSourceFunction extends RichSourceFunction<RowData> {
     private final HttpClientOptions httpClientOptions;
     private final DeserializationSchema<RowData> deserializer;
     private transient OkHttpClient httpClient;
+    private boolean isRunning = true;
 
     public HttpSourceFunction(RequestParamOptions requestParamOptions, ConnectionOptions connectionOptions, HttpClientOptions httpClientOptions, DeserializationSchema<RowData> deserializer) {
         this.requestParamOptions = requestParamOptions;
@@ -40,20 +44,34 @@ public class HttpSourceFunction extends RichSourceFunction<RowData> {
     }
 
     @Override
-    public void run(SourceContext<RowData> sourceContext) throws Exception {
-        String headers = requestParamOptions.getHeaders();
-        String requestType = requestParamOptions.getRequestType();
-        String[] headersArr = headers.split(",");
-        if (ArrayUtils.isNotEmpty(headersArr)) {
-            for (String headerKv : headersArr) {
-                String[] headerKvArr = headerKv.split(":");
-                Preconditions.checkArgument(ArrayUtils.isNotEmpty(headerKvArr) && headerKv.length() == 2, "header参数异常");
-                switch (RequestParamOptions.RequestType.valueOf(requestType)) {
-                    case GET:
-                        httpClient.newCall(new Request().newBuilder().addHeader(headerKvArr[0],headerKvArr[1]));
-                    case PATCH:
-                    case POST:
-                    case DELETE:
+    public void run(SourceContext<RowData> ctx) throws Exception {
+        while (isRunning) {
+            String headers = requestParamOptions.getHeaders();
+            String requestType = requestParamOptions.getRequestType();
+            String[] headersArr = headers.split(",");
+            Call request = null;
+            if (ArrayUtils.isNotEmpty(headersArr)) {
+                for (String headerKv : headersArr) {
+                    String[] headerKvArr = headerKv.split(":");
+                    Preconditions.checkArgument(ArrayUtils.isNotEmpty(headerKvArr) && headerKv.length() == 2, "header参数异常");
+
+                    switch (RequestParamOptions.RequestType.valueOf(requestType)) {
+                        case GET:
+                            request = httpClient.newCall(new Request.Builder().get().url(requestParamOptions.getRequestUrl()).addHeader(headerKvArr[0], headerKvArr[1]).build());
+                            break;
+                        case PATCH:
+                            break;
+                        case POST:
+                            break;
+                        case DELETE:
+                            break;
+                        default:
+                            throw new RuntimeException("请求类型不支持");
+                    }
+                }
+                if (null != request) {
+                    byte[] result = Objects.requireNonNull(request.execute().body()).bytes();
+                    ctx.collect(deserializer.deserialize(result));
                 }
             }
         }
@@ -62,6 +80,7 @@ public class HttpSourceFunction extends RichSourceFunction<RowData> {
 
     @Override
     public void cancel() {
-
+        isRunning = false;
+        httpClient = null;
     }
 }
