@@ -1,4 +1,4 @@
-package dev.learn.flink.tablesql.udfsource;
+package dev.learn.flink.tablesql.httpConnector.sink;
 
 import org.apache.flink.table.connector.ChangelogMode;
 import org.apache.flink.table.connector.sink.DynamicTableSink;
@@ -9,7 +9,7 @@ import org.apache.flink.table.connector.sink.DynamicTableSink;
  * @author: by echo huang
  * @date: 2021/1/16 11:35 下午
  */
-public class UDFTableSink implements DynamicTableSink {
+public class HttpTableSink implements DynamicTableSink {
     @Override
     public ChangelogMode getChangelogMode(ChangelogMode changelogMode) {
         return null;

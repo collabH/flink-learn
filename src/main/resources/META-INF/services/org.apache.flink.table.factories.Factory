@@ -1,2 +1,2 @@
-dev.learn.flink.tablesql.udfsource.UDFTableSinkFactory
-dev.learn.flink.tablesql.udfsource.UDFTableSourceFactory
+dev.learn.flink.tablesql.httpConnector.sink.HttpTableSinkFactory
+dev.learn.flink.tablesql.httpConnector.source.HttpTableSourceFactory

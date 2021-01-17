@@ -1,4 +1,4 @@
-package dev.learn.flink.tablesql.udfsource;
+package dev.learn.flink.tablesql.httpConnector.sink;
 
 import org.apache.flink.configuration.ConfigOption;
 import org.apache.flink.table.connector.sink.DynamicTableSink;
@@ -12,7 +12,7 @@ import java.util.Set;
  * @author: by echo huang
  * @date: 2021/1/16 11:35 下午
  */
-public class UDFTableSinkFactory implements DynamicTableSinkFactory {
+public class HttpTableSinkFactory implements DynamicTableSinkFactory {
     @Override
     public DynamicTableSink createDynamicTableSink(Context context) {
         return null;
