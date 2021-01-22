@@ -1,14 +1,8 @@
 package dev.learn.flink.tablesql;
 
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.table.api.DataTypes;
 import org.apache.flink.table.api.EnvironmentSettings;
-import org.apache.flink.table.api.ExplainDetail;
-import org.apache.flink.table.api.Table;
-import org.apache.flink.table.api.TableEnvironment;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
-
-import java.util.Arrays;
 
 /**
  * @fileName: UseTableEnvironment.java
@@ -27,25 +21,33 @@ public class UseTableEnvironment {
         StreamTableEnvironment tableEnvironment = StreamTableEnvironment.create(env, settings);
 
         // create batch execute environment
-        EnvironmentSettings batchSettings = EnvironmentSettings.newInstance()
-                .inBatchMode().useBlinkPlanner().build();
-        TableEnvironment tableEnvironment1 = TableEnvironment.create(batchSettings);
+//        EnvironmentSettings batchSettings = EnvironmentSettings.newInstance()
+//                .inBatchMode().useBlinkPlanner().build();
+//        TableEnvironment tableEnvironment1 = TableEnvironment.create(batchSettings);
 
 
-        Table table = tableEnvironment.fromValues(DataTypes.ROW(DataTypes.FIELD("id", DataTypes.INT().notNull())), 1, 2, 3, 4, 5);
+//        Table table = tableEnvironment.fromValues(DataTypes.ROW(DataTypes.FIELD("id", DataTypes.INT().notNull())), 1, 2, 3, 4, 5);
+//
+//        tableEnvironment.createTemporaryView("test", table);
+//
+//        tableEnvironment.executeSql("select * from test").print();
+//        tableEnvironment.from("test").execute().print();
+//        System.out.println(Arrays.toString(tableEnvironment.listCatalogs()));
+//        System.out.println(Arrays.toString(tableEnvironment.listModules()));
+//        System.out.println(Arrays.toString(tableEnvironment.listTables()));
+//        System.out.println(Arrays.toString(tableEnvironment.listViews()));
+//        System.out.println(Arrays.toString(tableEnvironment.listTemporaryTables()));
+//        System.out.println(Arrays.toString(tableEnvironment.listTemporaryViews()));
+//        System.out.println(tableEnvironment.explainSql("select * from test", ExplainDetail.ESTIMATED_COST));
 
-        tableEnvironment.createTemporaryView("test", table);
 
-        tableEnvironment.executeSql("select * from test").print();
-        tableEnvironment.from("test").execute().print();
-        System.out.println(Arrays.toString(tableEnvironment.listCatalogs()));
-        System.out.println(Arrays.toString(tableEnvironment.listModules()));
-        System.out.println(Arrays.toString(tableEnvironment.listTables()));
-        System.out.println(Arrays.toString(tableEnvironment.listViews()));
-        System.out.println(Arrays.toString(tableEnvironment.listTemporaryTables()));
-        System.out.println(Arrays.toString(tableEnvironment.listTemporaryViews()));
-        System.out.println(tableEnvironment.explainSql("select * from test", ExplainDetail.ESTIMATED_COST));
-
+        // test custom http
+        tableEnvironment.executeSql("create table testhttp(id string,name string)with(" +
+                "'http.client.request-url'='http://hadoop:8080/test'," +
+                "'http.client.format.classname'='dev.learn.flink.User'," +
+                "'connector.type'='http'," +
+                "'format'='http-json-bean')")
+                .print();
 
     }
 }
