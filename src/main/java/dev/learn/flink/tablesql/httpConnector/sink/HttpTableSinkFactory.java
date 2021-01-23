@@ -20,7 +20,7 @@ public class HttpTableSinkFactory implements DynamicTableSinkFactory {
 
     @Override
     public String factoryIdentifier() {
-        return null;
+        return "http";
     }
 
     @Override

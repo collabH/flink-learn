@@ -45,9 +45,13 @@ public class UseTableEnvironment {
         tableEnvironment.executeSql("create table testhttp(id string,name string)with(" +
                 "'http.client.request-url'='http://hadoop:8080/test'," +
                 "'http.client.format.classname'='dev.learn.flink.User'," +
-                "'connector.type'='http'," +
-                "'format'='http-json-bean')")
-                .print();
+                "'connector'='http'," +
+                "'format'='http-json-bean')");
+
+
+        tableEnvironment.executeSql("CREATE TABLE print_table WITH ('connector' = 'print') LIKE testhttp (EXCLUDING ALL)");
+
+        tableEnvironment.executeSql("insert into print_table select * from testhttp").print();
 
     }
 }
