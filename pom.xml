@@ -24,7 +24,7 @@ under the License.
     <artifactId>flink-learn</artifactId>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>application-mode</module>
+        <module>iceberg-with-flink</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -196,11 +196,11 @@ under the License.
             <artifactId>flink-cep_${scala.binary.version}</artifactId>
             <version>${flink.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-formats</artifactId>
-            <version>${flink.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.apache.flink</groupId>-->
+<!--            <artifactId>flink-formats</artifactId>-->
+<!--            <version>${flink.version}</version>-->
+<!--        </dependency>-->
         <!-- Add connector dependencies here. They must be in the default scope (compile). -->
 
 
