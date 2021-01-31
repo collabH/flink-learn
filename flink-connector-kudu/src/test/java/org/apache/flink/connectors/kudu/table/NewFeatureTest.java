@@ -57,7 +57,7 @@ public class NewFeatureTest {
         statementSet.addInsertSql("insert into test_Replice_kudu values(14,'2021-05-03','hsm')");
         JobExecutionResult jobExecutionResult = statementSet.execute().getJobClient()
                 .get()
-                .getJobExecutionResult()
+                .getJobExecutionResult(this.getClass().getClassLoader())
                 .get(1, TimeUnit.MINUTES);
 //        tableEnv.executeSql("insert into testRange values(1,'hsm')");
     }

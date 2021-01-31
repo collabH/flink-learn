@@ -18,12 +18,8 @@
 
 package dev.learn.flink;
 
-import org.apache.flink.api.common.RuntimeExecutionMode;
-import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
-import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 
 /**
  * Skeleton for a Flink Streaming Job.
@@ -42,9 +38,9 @@ public class StreamingJob {
     public static void main(String[] args) throws Exception {
         // set up the streaming execution environment
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-         env.setRuntimeMode(RuntimeExecutionMode.STREAMING);
-         env.enableCheckpointing(100);
-        DataStreamSource<Integer> integerDataStreamSource = env.fromElements(1, 2, 3, 4, 5,6,7,8);
+//         env.setRuntimeMode(RuntimeExecutionMode.STREAMING);
+        env.enableCheckpointing(100);
+        DataStreamSource<Integer> integerDataStreamSource = env.fromElements(1, 2, 3, 4, 5, 6, 7, 8);
         integerDataStreamSource.print();
 
 

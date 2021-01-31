@@ -18,8 +18,10 @@ public class IcebergFlinkSQL {
     public static void main(String[] args) throws ExecutionException, InterruptedException {
         final StreamExecutionEnvironment executionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment();
 
-        TableEnvironment tableEnv = TableEnvironment.create(
-                EnvironmentSettings.newInstance().inBatchMode().useBlinkPlanner().build());
+//        TableEnvironment tableEnv = TableEnvironment.create(
+//                EnvironmentSettings.newInstance().inBatchMode().useBlinkPlanner().build());
+        TableEnvironment tableEnv = StreamTableEnvironment.create(executionEnvironment,
+                EnvironmentSettings.newInstance().inStreamingMode().useBlinkPlanner().build());
         tableEnv.executeSql("CREATE CATALOG hive_catalog WITH (\n" +
                 "  'type'='iceberg',\n" +
                 "  'catalog-type'='hive',\n" +
@@ -33,11 +35,11 @@ public class IcebergFlinkSQL {
         tableEnv.useDatabase("iceberg_db");
 //        tableEnv.executeSql("create table test_iceberg(id int,name string)with(" +
 //                "'write.format.default'='parquet')");
-        StatementSet statementSet = tableEnv.createStatementSet();
-        statementSet.addInsertSql("insert overwrite test_iceberg values(1,'hsm')");
+//        StatementSet statementSet = tableEnv.createStatementSet();
+//        statementSet.addInsertSql("insert overwrite test_iceberg values(1,'hsm')");
 //        statementSet.addInsertSql("insert into test_iceberg values(2,'hsm1')");
-        statementSet.execute().getJobClient().get().getJobExecutionResult(IcebergFlinkSQL.class.getClassLoader())
-                .get();
+//        statementSet.execute().getJobClient().get().getJobExecutionResult(IcebergFlinkSQL.class.getClassLoader())
+//                .get();
         tableEnv.executeSql("select * from test_iceberg").print();
     }
 }
