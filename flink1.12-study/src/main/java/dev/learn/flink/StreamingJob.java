@@ -18,8 +18,13 @@
 
 package dev.learn.flink;
 
-import org.apache.flink.streaming.api.datastream.DataStreamSource;
+import org.apache.flink.api.common.serialization.SimpleStringSchema;
+import org.apache.flink.kafka.shaded.org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.flink.kafka.shaded.org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
+
+import java.util.Properties;
 
 /**
  * Skeleton for a Flink Streaming Job.
@@ -39,10 +44,15 @@ public class StreamingJob {
         // set up the streaming execution environment
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 //         env.setRuntimeMode(RuntimeExecutionMode.STREAMING);
-        env.enableCheckpointing(100);
-        DataStreamSource<Integer> integerDataStreamSource = env.fromElements(1, 2, 3, 4, 5, 6, 7, 8);
-        integerDataStreamSource.print();
 
+        Properties props = new Properties();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "hadoop:9092,hadoop:9093,hadoop:9094");
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        FlinkKafkaConsumer<String> consumer = new FlinkKafkaConsumer<String>("test.ds1.user", new SimpleStringSchema(), props);
+        env.addSource(consumer)
+                .print();
 
         /*
          * Here, you can start creating your execution plan for Flink.

@@ -1,6 +1,5 @@
 package dev.learn.flink;
 
-import org.apache.flink.connectors.kudu.table.KuduCatalog;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
@@ -16,9 +15,9 @@ public class KuduTest {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
         StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env, EnvironmentSettings.newInstance().inStreamingMode().useBlinkPlanner().build());
-        KuduCatalog catalog = new KuduCatalog("kudu", "hadoop:7051");
+//        KuduCatalog catalog = new KuduCatalog("kudu", "hadoop:7051");
 
-        tableEnv.registerCatalog("kudu", catalog);
+//        tableEnv.registerCatalog("kudu", catalog);
         tableEnv.useCatalog("kudu");
         tableEnv.executeSql("drop table ods_user");
         tableEnv.executeSql("create table ods_user(id bigint,name string,sex int)with('kudu.hash-columns'='id','kudu.primary-key-columns'='id')");
