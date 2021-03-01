@@ -21,20 +21,12 @@ public class KeyOperrator {
 
         DataStreamSource<String> datasource = env.fromElements("hello,hsm,zhangsan,hsm,hello,sz,ls,sz,li,hsm");
 
-        datasource.flatMap(new FlatMapFunction<String, String>() {
-            @Override
-            public void flatMap(String s, Collector<String> collector) throws Exception {
-                for (String s1 : s.split(",")) {
-                    collector.collect(s1);
-                }
+        datasource.flatMap((FlatMapFunction<String, String>) (s, collector) -> {
+            for (String s1 : s.split(",")) {
+                collector.collect(s1);
             }
         }).map(new WordCountMapFunction())
-                .keyBy(new KeySelector<Tuple2<String, Integer>, String>() {
-                    @Override
-                    public String getKey(Tuple2<String, Integer> stringIntegerTuple2) throws Exception {
-                        return stringIntegerTuple2.f0;
-                    }
-                }).reduce(new SumReduceFunction())
+                .keyBy((KeySelector<Tuple2<String, Integer>, String>) stringIntegerTuple2 -> stringIntegerTuple2.f0).reduce(new SumReduceFunction())
                 .print();
 
         env.execute();

@@ -1,5 +1,6 @@
 package dev.learn.flink.asyncio;
 
+import com.sun.jmx.snmp.tasks.ThreadService;
 import org.apache.commons.io.IOUtils;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.AsyncDataStream;
@@ -8,6 +9,7 @@ import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.async.ResultFuture;
 import org.apache.flink.streaming.api.functions.async.RichAsyncFunction;
+import org.apache.kafka.common.utils.ThreadUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,7 +17,11 @@ import java.net.Socket;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 

@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
 import org.apache.flink.configuration.Configuration;
+import org.apache.flink.runtime.operators.util.BloomFilter;
 import org.apache.flink.streaming.api.TimerService;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;

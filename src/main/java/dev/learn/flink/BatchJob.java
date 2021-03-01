@@ -70,6 +70,7 @@ public class BatchJob {
                 "flink",
                 "flink"
         ));
+
          dataSource.map(new WordCountMapFunction())
                 .groupBy(0)
                 .reduce(new SumReduceFunction()).print();

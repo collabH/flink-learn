@@ -9,6 +9,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.assigners.GlobalWindows;
+import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.triggers.DeltaTrigger;
 
 /**
@@ -41,7 +42,9 @@ public class UseWindowFunction {
                     // 会话窗口
 //                }).window(EventTimeSessionWindows.withGap(Time.seconds(10)))
                     // 全局窗口
-                }).window(GlobalWindows.create())
+                })
+
+                .window(GlobalWindows.create())
                 .reduce(new SumReduceFunction())
                 .print("window");
 
