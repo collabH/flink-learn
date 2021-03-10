@@ -2,15 +2,22 @@ package dev.learn.flink.state;
 
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.common.functions.RichMapFunction;
+import org.apache.flink.api.common.state.ListState;
+import org.apache.flink.api.common.state.MapState;
+import org.apache.flink.api.common.state.MapStateDescriptor;
 import org.apache.flink.api.common.state.ReducingState;
 import org.apache.flink.api.common.state.ReducingStateDescriptor;
+import org.apache.flink.api.common.state.StateTtlConfig;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
+import org.apache.flink.api.common.time.Time;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @fileName: UseKeyedState.java
@@ -35,6 +42,8 @@ public class UseKeyedState {
                 .map(new RichMapFunction<Tuple2<String, Integer>, Integer>() {
                     private transient ValueState<Integer> count;
                     private transient ReducingState<String> reducingState;
+                    private transient MapState<String, String> mapState;
+                    private transient ListState<String> listState;
 
                     @Override
                     public void open(Configuration parameters) throws Exception {
@@ -47,6 +56,11 @@ public class UseKeyedState {
                                 return value1 + value2;
                             }
                         }, String.class);
+                        StateTtlConfig stateTtlConfig = StateTtlConfig.newBuilder(Time.of(1, TimeUnit.HOURS)).build();
+                        MapStateDescriptor<String, String> mapStateDescriptor = new MapStateDescriptor<>("map-state", String.class, String.class);
+                        // 设置ttl state
+                        mapStateDescriptor.enableTimeToLive(stateTtlConfig);
+                        mapState = getRuntimeContext().getMapState(mapStateDescriptor);
                         reducingState = getRuntimeContext().getReducingState(reducingStateDescriptor);
                         super.open(parameters);
                     }
