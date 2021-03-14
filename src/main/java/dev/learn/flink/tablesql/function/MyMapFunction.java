@@ -1,5 +1,6 @@
 package dev.learn.flink.tablesql.function;
 
+import org.apache.flink.table.annotation.DataTypeHint;
 import org.apache.flink.table.functions.ScalarFunction;
 
 /**
@@ -9,7 +10,7 @@ import org.apache.flink.table.functions.ScalarFunction;
  * @date: 2020/9/4 11:57 下午
  */
 public class MyMapFunction extends ScalarFunction {
-    public String eval(Integer a) {
+    public @DataTypeHint("STRING") String eval(Integer a) {
         return "hello:" + a;
     }
 }

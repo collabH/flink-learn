@@ -35,14 +35,14 @@ public class UseRowOperator {
         MyFlatMapFunction func = new MyFlatMapFunction();
 
         //flatmap
-//        table.flatMap(call(func,$("id")))
-//                .execute().print();
+        table.map(call(func,$("id")))
+                .execute().print();
 
         // aggregate
-        MyAggFunction myAggFunction = new MyAggFunction();
-        table.groupBy($("id"))
-                .aggregate(call(myAggFunction, $("id")).as("agg"))
-                .select($("agg"))
-                .execute().print();
+//        MyAggFunction myAggFunction = new MyAggFunction();
+//        table.groupBy($("id"))
+//                .aggregate(call(myAggFunction, $("id")).as("agg"))
+//                .select($("agg"))
+//                .execute().print();
     }
 }
