@@ -5,6 +5,11 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.aggregation.Aggregations;
 import org.apache.flink.api.java.operators.DataSource;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.utils.DataSetUtils;
+import org.apache.flink.hadoopcompatibility.HadoopInputs;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 
 /**
  * @fileName: DataSetDemo.java
@@ -16,11 +21,16 @@ public class DataSetDemo {
     public static void main(String[] args) throws Exception {
         ExecutionEnvironment dataSetEnv = ExecutionEnvironment.getExecutionEnvironment();
 
-//        DataSource<Integer> dataSource = dataSetEnv.fromElements(1, 2, 3, 4, 5);
-        DataSource<Tuple2<String, Integer>> dataSource = dataSetEnv.fromElements(Tuple2.of("a", 1), Tuple2.of("a", 1), Tuple2.of("b", 10), Tuple2.of("a", 2));
+        DataSource<Integer> dataSource = dataSetEnv.fromElements(1, 2, 3, 4, 5);
+//        DataSource<Tuple2<String, Integer>> dataSource = dataSetEnv.fromElements(Tuple2.of("a", 1), Tuple2.of("a", 1), Tuple2.of("b", 10), Tuple2.of("a", 2));
 
 //        map(dataSource);
-        project(dataSource);
+//        project(dataSource);
+
+        dataSetEnv.createInput(HadoopInputs.readHadoopFile(new TextInputFormat(), LongWritable.class, Text.class, "test"));
+
+        DataSetUtils.zipWithUniqueId(dataSource)
+                .print();
     }
 
 
@@ -116,6 +126,7 @@ public class DataSetDemo {
 
     /**
      * project
+     *
      * @param source
      * @throws Exception
      */
@@ -124,4 +135,6 @@ public class DataSetDemo {
                 .project(0)
                 .print();
     }
+
+
 }
