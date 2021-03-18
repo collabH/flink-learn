@@ -1,6 +1,8 @@
 package dev.learn.flink.tablesql.table;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.flink.api.common.typeinfo.AtomicType;
+import org.apache.flink.api.common.typeinfo.IntegerTypeInfo;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
@@ -32,6 +34,7 @@ public class UseScanOperator {
 
         tableEnv.useCatalog("dev");
         tableEnv.useDatabase("dev-db");
+
 
 
         Table table = tableEnv.fromValues(ROW(FIELD("id", BIGINT().notNull()), FIELD("name", VARCHAR(32).notNull())),
