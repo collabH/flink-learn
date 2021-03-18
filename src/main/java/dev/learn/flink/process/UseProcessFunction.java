@@ -1,7 +1,9 @@
 package dev.learn.flink.process;
 
+import org.apache.flink.api.java.operators.DataSource;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.TimerService;
+import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.ProcessFunction;
@@ -47,6 +49,9 @@ class MyProcessFunction extends ProcessFunction<Integer, String> {
 
         // 获取当前waterMark
         long watermark = timerService.currentWatermark();
+
+        // 非keyedStream不支持timer
+//        timerService.registerProcessingTimeTimer(watermark);
 
         // 输出到downOperator
         collector.collect("process:" + value);
