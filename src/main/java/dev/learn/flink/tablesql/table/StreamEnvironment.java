@@ -14,7 +14,8 @@ import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 public class StreamEnvironment {
     public static StreamTableEnvironment getEnv(StreamExecutionEnvironment env) {
         EnvironmentSettings settings = EnvironmentSettings.newInstance()
-                .inStreamingMode().useBlinkPlanner().build();
+                .inStreamingMode().useBlinkPlanner()
+                .build();
         return StreamTableEnvironment.create(env, settings);
     }
 
