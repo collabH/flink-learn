@@ -7,9 +7,11 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.table.functions.TemporalTableFunction;
+import org.apache.flink.table.module.Module;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static org.apache.flink.table.api.Expressions.$;
 import static org.apache.flink.table.api.Expressions.call;
@@ -45,6 +47,13 @@ public class TemporalFunction {
 // 指定 "r_proctime" 为时间属性，指定 "r_currency" 为主键
         TemporalTableFunction rates = ratesHistory.createTemporalTableFunction($("r_proctime"), $("r_currency")); // <==== (1)
 
+
+        tEnv.loadModule("test", new Module() {
+            @Override
+            public Set<String> listFunctions() {
+                return null;
+            }
+        });
         /**
          * 时态表
          */
