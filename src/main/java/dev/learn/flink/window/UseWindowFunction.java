@@ -62,7 +62,7 @@ public class UseWindowFunction {
                         return value;
                     }
                 }).window(GlobalWindows.create())
-                .trigger(DeltaTrigger.of(10000, (oldDataPoint, newDataPoint) -> {
+                .trigger(DeltaTrigger.of( 10000, (oldDataPoint, newDataPoint) -> {
                     return newDataPoint - oldDataPoint;
                 }, IntSerializer.INSTANCE)).max(1);
     }
