@@ -1,6 +1,7 @@
 package dev.learn.flink.transform;
 
 import com.google.common.collect.Lists;
+import org.apache.flink.api.common.functions.Partitioner;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.functions.KeySelector;
@@ -40,6 +41,7 @@ public class MutilStreamOperator {
 //            }
 //        }).select("high")
 //                .print("high");
+
 
         // 合流
         datasource.connect(datasource1)
