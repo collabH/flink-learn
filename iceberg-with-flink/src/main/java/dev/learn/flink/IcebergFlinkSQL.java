@@ -2,9 +2,11 @@ package dev.learn.flink;
 
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.EnvironmentSettings;
+import org.apache.flink.table.api.SqlDialect;
 import org.apache.flink.table.api.StatementSet;
 import org.apache.flink.table.api.TableEnvironment;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
+import org.apache.flink.table.catalog.ObjectPath;
 
 import java.util.concurrent.ExecutionException;
 
@@ -33,13 +35,17 @@ public class IcebergFlinkSQL {
         tableEnv.useCatalog("hive_catalog");
         tableEnv.executeSql("create database if not exists iceberg_db");
         tableEnv.useDatabase("iceberg_db");
-//        tableEnv.executeSql("create table test_iceberg(id int,name string)with(" +
-//                "'write.format.default'='parquet')");
-//        StatementSet statementSet = tableEnv.createStatementSet();
-//        statementSet.addInsertSql("insert overwrite test_iceberg values(1,'hsm')");
-//        statementSet.addInsertSql("insert into test_iceberg values(2,'hsm1')");
-//        statementSet.execute().getJobClient().get().getJobExecutionResult(IcebergFlinkSQL.class.getClassLoader())
-//                .get();
+        tableEnv.getConfig().setSqlDialect(SqlDialect.HIVE);
+        if (!tableEnv.getCatalog("hive_catalog")
+                .get().tableExists(new ObjectPath("iceberg_db","test_iceberg"))) {
+            tableEnv.executeSql("create table iceberg_table(id int,name string)partitioned by(dt string)");
+        }
+
+        StatementSet statementSet = tableEnv.createStatementSet();
+        statementSet.addInsertSql("insert overwrite test_iceberg values(1,'hsm')");
+        statementSet.addInsertSql("insert into test_iceberg values(2,'hsm1')");
+        statementSet.execute().getJobClient().get().getJobExecutionResult(IcebergFlinkSQL.class.getClassLoader())
+                .get();
         tableEnv.executeSql("select * from test_iceberg").print();
     }
 }
