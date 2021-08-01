@@ -12,7 +12,7 @@ import java.util.concurrent.ExecutionException;
 
 /**
  * @fileName: IcebergWithFlink.java
- * @description: IcebergWithFlink.java类说明
+ * @description: iceberg整合Flink
  * @author: by echo huang
  * @date: 2021/1/27 11:43 下午
  */
@@ -37,15 +37,14 @@ public class IcebergFlinkSQL {
         tableEnv.useDatabase("iceberg_db");
         tableEnv.getConfig().setSqlDialect(SqlDialect.HIVE);
         if (!tableEnv.getCatalog("hive_catalog")
-                .get().tableExists(new ObjectPath("iceberg_db","test_iceberg"))) {
+                .get().tableExists(new ObjectPath("iceberg_db","iceberg_table"))) {
             tableEnv.executeSql("create table iceberg_table(id int,name string)partitioned by(dt string)");
         }
 
         StatementSet statementSet = tableEnv.createStatementSet();
-        statementSet.addInsertSql("insert overwrite test_iceberg values(1,'hsm')");
-        statementSet.addInsertSql("insert into test_iceberg values(2,'hsm1')");
-        statementSet.execute().getJobClient().get().getJobExecutionResult(IcebergFlinkSQL.class.getClassLoader())
-                .get();
-        tableEnv.executeSql("select * from test_iceberg").print();
+        statementSet.addInsertSql("insert into iceberg_table values(1,'hsm','20210718')");
+        statementSet.addInsertSql("insert into iceberg_table values(2,'hsm1','20210718')");
+        statementSet.execute();
+//        tableEnv.executeSql("select * from iceberg_table").print();
     }
 }
