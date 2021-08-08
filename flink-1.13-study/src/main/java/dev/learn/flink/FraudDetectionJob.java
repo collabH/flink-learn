@@ -29,22 +29,24 @@ import org.apache.flink.walkthrough.common.source.TransactionSource;
  * Skeleton code for the datastream walkthrough
  */
 public class FraudDetectionJob {
-	public static void main(String[] args) throws Exception {
-		StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+    public static void main(String[] args) throws Exception {
+        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
-		DataStream<Transaction> transactions = env
-			.addSource(new TransactionSource())
-			.name("transactions");
+        // 设置缓冲区满后超时时间
+        env.setBufferTimeout(100);
+        DataStream<Transaction> transactions = env
+                .addSource(new TransactionSource())
+                .name("transactions");
 
-		DataStream<Alert> alerts = transactions
-			.keyBy(Transaction::getAccountId)
-			.process(new FraudDetector())
-			.name("fraud-detector");
+        DataStream<Alert> alerts = transactions
+                .keyBy(Transaction::getAccountId)
+                .process(new FraudDetector())
+                .name("fraud-detector");
 
-		alerts
-			.addSink(new AlertSink())
-			.name("send-alerts");
+        alerts
+                .addSink(new AlertSink())
+                .name("send-alerts");
 
-		env.execute("Fraud Detection");
-	}
+        env.execute("Fraud Detection");
+    }
 }
