@@ -8,12 +8,16 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.flink.api.common.state.BroadcastState;
 import org.apache.flink.api.common.state.ListState;
 import org.apache.flink.api.common.state.ListStateDescriptor;
+import org.apache.flink.api.common.state.MapStateDescriptor;
+import org.apache.flink.api.common.state.ReadOnlyBroadcastState;
 import org.apache.flink.api.common.state.StateTtlConfig;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
 import org.apache.flink.api.common.time.Time;
+import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.functions.KeySelector;
@@ -22,11 +26,14 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.flink.runtime.state.FunctionInitializationContext;
 import org.apache.flink.runtime.state.FunctionSnapshotContext;
 import org.apache.flink.streaming.api.checkpoint.CheckpointedFunction;
+import org.apache.flink.streaming.api.datastream.BroadcastStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.streaming.api.functions.ProcessFunction;
+import org.apache.flink.streaming.api.functions.co.BroadcastProcessFunction;
+import org.apache.flink.streaming.api.functions.co.CoProcessFunction;
 import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.apache.flink.util.Collector;
 
@@ -63,6 +70,57 @@ public class StateFeature {
         StreamExecutionEnvironment streamEnv = FlinkEnvUtils.getStreamEnv();
         DataStreamSource<Tuple2<String, Integer>> ds = streamEnv.fromElements(Tuple2.<String, Integer>of("name", 1));
         ds.addSink(new OperatorBufferingSink(10));
+    }
+
+    /**
+     * 广播状态
+     *
+     * 1.广播状态不会跨task读取，所以广播状态需要在process中进行更新，抱着每个task搜到广播数据后及时更新到广播状态中
+     * 2.所有task都会对广播状态进行checkpoint这样是为了恢复状态时不会存在热点文件问题，但是存在写放大，根据p（并行度）的大小方法p倍
+     * 3.  broadcast state 在运行时保存在内存中，需要保证内存充足
+     */
+    public static void broadcastState() {
+        StreamExecutionEnvironment streamEnv = FlinkEnvUtils.getStreamEnv();
+        MapStateDescriptor<String, String> broadcastStateDesc = new MapStateDescriptor<String, String>(
+                // BasicTypeInfo继承TypeInformation的基础类型封装
+                "broadcastDesc", BasicTypeInfo.STRING_TYPE_INFO, TypeInformation.of(String.class));
+        DataStreamSource<Integer> ds = streamEnv.fromElements(1, 2, 3, 4, 5, 6);
+        DataStreamSource<Integer> broadcastDs = streamEnv.fromElements(1, 2);
+        BroadcastStream<Integer> broadcast = broadcastDs.broadcast(broadcastStateDesc);
+        ds.connect(broadcast)
+                .process(new BroadcastProcessFunction<Integer, Integer, Integer>() {
+
+                    /**
+                     * 只能读取广播状态
+                     * @param integer
+                     * @param readOnlyContext
+                     * @param collector
+                     * @throws Exception
+                     */
+                    @Override
+                    public void processElement(Integer integer, ReadOnlyContext readOnlyContext,
+                                               Collector<Integer> collector) throws Exception {
+                        ReadOnlyBroadcastState<String, String> broadcastState =
+                                readOnlyContext.getBroadcastState(broadcastStateDesc);
+
+                        String sum = broadcastState.get("sum");
+                        collector.collect(Integer.parseInt(sum) + integer);
+                    }
+
+                    /**
+                     * 广播状态更新
+                     * @param integer
+                     * @param context
+                     * @param collector
+                     * @throws Exception
+                     */
+                    @Override
+                    public void processBroadcastElement(Integer integer, Context context,
+                                                        Collector<Integer> collector) throws Exception {
+                        BroadcastState<String, String> broadcastState = context.getBroadcastState(broadcastStateDesc);
+                        broadcastState.put("sum", integer.toString());
+                    }
+                });
     }
 
     @Data
