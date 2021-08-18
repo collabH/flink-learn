@@ -3,11 +3,13 @@ package dev.learn.flink.feature;
 import com.sun.tools.corba.se.idl.constExpr.Times;
 import com.sun.xml.internal.ws.util.StreamUtils;
 import dev.learn.flink.FlinkEnvUtils;
+import dev.learn.flink.state.CustomStateSerialization;
 import jdk.internal.util.EnvUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.flink.api.common.JobID;
 import org.apache.flink.api.common.state.BroadcastState;
 import org.apache.flink.api.common.state.ListState;
 import org.apache.flink.api.common.state.ListStateDescriptor;
@@ -23,6 +25,7 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
+import org.apache.flink.queryablestate.client.QueryableStateClient;
 import org.apache.flink.runtime.state.FunctionInitializationContext;
 import org.apache.flink.runtime.state.FunctionSnapshotContext;
 import org.apache.flink.streaming.api.checkpoint.CheckpointedFunction;
@@ -37,8 +40,10 @@ import org.apache.flink.streaming.api.functions.co.CoProcessFunction;
 import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.apache.flink.util.Collector;
 
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @fileName: StateFeature.java
@@ -74,7 +79,7 @@ public class StateFeature {
 
     /**
      * 广播状态
-     *
+     * <p>
      * 1.广播状态不会跨task读取，所以广播状态需要在process中进行更新，抱着每个task搜到广播数据后及时更新到广播状态中
      * 2.所有task都会对广播状态进行checkpoint这样是为了恢复状态时不会存在热点文件问题，但是存在写放大，根据p（并行度）的大小方法p倍
      * 3.  broadcast state 在运行时保存在内存中，需要保证内存充足
@@ -122,6 +127,55 @@ public class StateFeature {
                     }
                 });
     }
+
+    /**
+     * 状态查询客户端
+     * 将 flink-queryable-state-runtime_2.11-1.13.0.jar 从 Flink distribution 的 opt/ 目录拷贝到 lib/ 目录；
+     * 将参数 queryable-state.enable 设置为 true
+     */
+    public static void queryStateClient() {
+        StreamExecutionEnvironment streamEnv = FlinkEnvUtils.getStreamEnv();
+        DataStreamSource<WordCount> ds = streamEnv.fromElements(WordCount.builder().word("hello")
+                .id(1).build(), WordCount.builder().id(2).word("world").build());
+        KeyedStream<WordCount, Integer> keyedStream = ds.keyBy(new KeySelector<WordCount, Integer>() {
+            @Override
+            public Integer getKey(WordCount wordCount) throws Exception {
+                return wordCount.getId();
+            }
+        });
+        keyedStream.process(new KeyedProcessFunction<Integer, WordCount, Object>() {
+            @Override
+            public void open(Configuration parameters) throws Exception {
+                super.open(parameters);
+                ValueStateDescriptor<Long> valueStateDescriptor = new ValueStateDescriptor<>("test", Long.class);
+                valueStateDescriptor.setQueryable("test-query");
+            }
+
+            @Override
+            public void processElement(WordCount wordCount, Context context, Collector<Object> collector) throws Exception {
+
+            }
+        });
+        ValueStateDescriptor<Long> valueStateDescriptor = new ValueStateDescriptor<>("test", Long.class);
+        try {
+            QueryableStateClient client = new QueryableStateClient("localhost", 42931);
+            CompletableFuture<ValueState<Long>> kvState = client.getKvState(JobID.generate(), "test-query", "1",
+                    TypeInformation.of(String.class),
+                    valueStateDescriptor);
+            ValueState<Long> longValueState = kvState.get();
+            System.out.println("state:" + longValueState.value());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void customStateSerializer() {
+        ListStateDescriptor<Tuple2<String, Integer>> descriptor =
+                new ListStateDescriptor<>(
+                        "state-name",
+                        new CustomStateSerialization());
+    }
+
 
     @Data
     @Builder
