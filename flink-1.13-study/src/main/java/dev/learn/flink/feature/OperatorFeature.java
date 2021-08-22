@@ -1,15 +1,20 @@
 package dev.learn.flink.feature;
 
 import dev.learn.flink.FlinkEnvUtils;
+import javafx.util.Callback;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.runtime.concurrent.FutureUtils;
 import org.apache.flink.streaming.api.TimeCharacteristic;
+import org.apache.flink.streaming.api.datastream.AsyncDataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.async.AsyncFunction;
+import org.apache.flink.streaming.api.functions.async.ResultFuture;
 import org.apache.flink.streaming.api.functions.co.ProcessJoinFunction;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
@@ -18,6 +23,16 @@ import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTime
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
+
+import java.util.Collections;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * @fileName: OperatorFeature.java
@@ -151,6 +166,43 @@ public class OperatorFeature {
         streamEnv.execute();
     }
 
+
+    public static void asyncIo() {
+        StreamExecutionEnvironment streamEnv = FlinkEnvUtils.getStreamEnv();
+        SingleOutputStreamOperator<Integer> asyncIoStream =
+                AsyncDataStream.unorderedWait(streamEnv.fromElements(1, 23, 4), new AsyncFunction<Integer, Integer>() {
+                    @Override
+                    public void asyncInvoke(Integer value, ResultFuture<Integer> resultFuture) throws Exception {
+                        Future<Integer> result = FutureUtils.get(value);
+                        CompletableFuture.supplyAsync(new Supplier<Integer>() {
+                            @Override
+                            public Integer get() {
+                                try {
+                                    return result.get();
+                                } catch (InterruptedException | ExecutionException e) {
+                                    return null;
+                                }
+                            }
+                        }).thenAcceptAsync(new Consumer<Integer>() {
+                            @Override
+                            public void accept(Integer value) {
+                                resultFuture.complete(Collections.singleton(value));
+                            }
+                        });
+                    }
+                }, 1, TimeUnit.HOURS, 100);
+    }
+
+    static class FutureUtils {
+        public static Future<Integer> get(Integer key) {
+            return new FutureTask<>(new Callable<Integer>() {
+                @Override
+                public Integer call() throws Exception {
+                    return key + 1;
+                }
+            });
+        }
+    }
 
 
     public static void main(String[] args) throws Exception {
