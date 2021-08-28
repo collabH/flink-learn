@@ -18,6 +18,7 @@
 
 package dev.learn.flink;
 
+import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.walkthrough.common.sink.AlertSink;
@@ -31,7 +32,6 @@ import org.apache.flink.walkthrough.common.source.TransactionSource;
 public class FraudDetectionJob {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-
         // 设置缓冲区满后超时时间
         env.setBufferTimeout(100);
         DataStream<Transaction> transactions = env
