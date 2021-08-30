@@ -12,13 +12,15 @@ import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
  * @date: 2021/8/29 7:02 下午
  */
 public class SQLGrammarFeature {
-    static String expample_sql = "create table test(name string,id int)with('connector'='datagen')";
+    static String expample_sql = "create table test(name string,id int,event_time timestamp_ltz(3),watermark for " +
+            "event_time as event_time - INTERVAL '1' second)with" +
+            "('connector'='datagen')";
 
     public static void main(String[] args) {
         StreamExecutionEnvironment streamEnv = FlinkEnvUtils.getStreamEnv();
         StreamTableEnvironment tableEnvironment = StreamTableEnvironment.create(streamEnv);
 //        with(tableEnvironment);
-
+        window(tableEnvironment);
     }
 
     /**
@@ -45,6 +47,16 @@ public class SQLGrammarFeature {
     }
 
     private static void window(StreamTableEnvironment tableEnvironment) {
-
+        tableEnvironment.executeSql(expample_sql);
+        tableEnvironment.executeSql("desc test").print();
+        String tumbleWindowSQLGroupBy = "select window_start, window_end,sum(id) as count1 from TABLE(TUMBLE(TABLE test," +
+                "DESCRIPTOR (event_time),interval '5' second)) GROUP BY window_start, window_end";
+        String hopWindowSQLGroupBy = "select window_start, window_end,sum(id) as count1 from TABLE(HOP(TABLE test," +
+                "DESCRIPTOR (event_time),INTERVAL '1' second,interval '5' second)) GROUP BY window_start, window_end";
+        String cumulateWindowSQLGroupBy = "select window_start, window_end,max(id) as count1 from TABLE(CUMULATE" +
+                "(TABLE " +
+                "test,DESCRIPTOR (event_time),INTERVAL '1' second,interval '5' second)) GROUP BY window_start, window_end";
+        tableEnvironment.executeSql(cumulateWindowSQLGroupBy)
+                .print();
     }
 }
