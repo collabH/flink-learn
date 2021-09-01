@@ -11,17 +11,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Maven: org.apache.flink:flink-table-common:1.13.0" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.flink:flink-connector-files:1.13.0" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.flink:flink-table-api-java:1.13.0" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.flink:flink-table-api-java-bridge_2.11:1.13.0" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.flink:flink-table-planner-blink_2.11:1.13.0" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.flink:flink-table-api-scala_2.11:1.13.0" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.flink:flink-table-api-scala-bridge_2.11:1.13.0" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.flink:flink-scala_2.11:1.13.0" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.flink:flink-streaming-scala_2.11:1.13.0" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.flink:flink-table-runtime-blink_2.11:1.13.0" level="project" />
-    <orderEntry type="library" name="Maven: org.codehaus.janino:commons-compiler:3.0.11" level="project" />
     <orderEntry type="library" name="Maven: org.apache.flink:flink-queryable-state-client-java:1.13.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.flink:flink-shaded-netty:4.1.49.Final-13.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.flink:flink-shaded-guava:18.0-13.0" level="project" />
