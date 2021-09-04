@@ -11,12 +11,18 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Maven: com.twitter:chill-thrift:0.7.6" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.thrift:libthrift:0.11.0" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.12" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.4.1" level="project" />
+    <orderEntry type="library" name="Maven: com.twitter:chill-protobuf:0.7.6" level="project" />
+    <orderEntry type="library" name="Maven: com.twitter:chill-java:0.7.6" level="project" />
+    <orderEntry type="library" name="Maven: com.google.protobuf:protobuf-java:3.7.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.flink:flink-queryable-state-client-java:1.13.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.flink:flink-shaded-netty:4.1.49.Final-13.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.flink:flink-shaded-guava:18.0-13.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.flink:force-shading:1.13.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.flink:flink-walkthrough-common_2.11:1.13.0" level="project" />
-    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.15" level="project" />
     <orderEntry type="library" name="Maven: com.google.code.findbugs:jsr305:1.3.9" level="project" />
     <orderEntry type="library" name="Maven: org.apache.flink:flink-streaming-java_2.11:1.13.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.flink:flink-core:1.13.0" level="project" />
@@ -60,7 +66,6 @@
     <orderEntry type="library" name="Maven: com.github.scopt:scopt_2.11:3.5.0" level="project" />
     <orderEntry type="library" name="Maven: org.xerial.snappy:snappy-java:1.1.8.3" level="project" />
     <orderEntry type="library" name="Maven: com.twitter:chill_2.11:0.7.6" level="project" />
-    <orderEntry type="library" name="Maven: com.twitter:chill-java:0.7.6" level="project" />
     <orderEntry type="library" name="Maven: org.lz4:lz4-java:1.6.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.flink:flink-test-utils_2.11:1.13.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.flink:flink-test-utils-junit:1.13.0" level="project" />
