@@ -8,6 +8,7 @@ import com.twitter.chill.protobuf.ProtobufSerializer;
 import com.twitter.chill.thrift.TBaseSerializer;
 import dev.learn.flink.FlinkEnvUtils;
 import org.apache.flink.api.java.tuple.Tuple1;
+import org.apache.flink.queryablestate.network.Client;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
