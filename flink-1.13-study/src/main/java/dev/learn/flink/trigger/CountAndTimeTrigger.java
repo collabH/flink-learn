@@ -35,6 +35,7 @@ public class CountAndTimeTrigger extends Trigger<Object, TimeWindow> {
         count.add(1L);
         if (count.get() >= maxCount) {
             count.clear();
+            clear(window, ctx);
             return TriggerResult.FIRE;
         }
         ctx.registerProcessingTimeTimer(window.maxTimestamp());

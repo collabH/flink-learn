@@ -14,17 +14,22 @@ import java.util.Map;
  * @date: 2021/10/19 2:40 下午
  */
 public class TimeSourceFunction implements SourceFunction<Tuple2<String, String>> {
-    private static final Map<Integer,String> KEYS=Maps.newHashMap();
+    private static final Map<Integer, String> KEYS = Maps.newHashMap();
+
     static {
-        KEYS.put(1,"a");
-        KEYS.put(2,"b");
-        KEYS.put(3,"c");
-        KEYS.put(4,"d");
+        KEYS.put(1, "a");
+        KEYS.put(2, "b");
+        KEYS.put(3, "c");
+        KEYS.put(4, "d");
     }
+
     @Override
     public void run(SourceContext<Tuple2<String, String>> sourceContext) throws Exception {
         while (true) {
-            sourceContext.collect(Tuple2.of(KEYS.get(RandomUtils.nextInt(1,4)),"haha" + RandomUtils.nextInt(10, 1000)));
+            String key = KEYS.get(RandomUtils.nextInt(1, 4));
+            String value = "haha" + RandomUtils.nextInt(10, 1000);
+            System.out.println("source:" + key + "=====" + value);
+            sourceContext.collect(Tuple2.of(key, value));
             Thread.sleep(200);
         }
     }

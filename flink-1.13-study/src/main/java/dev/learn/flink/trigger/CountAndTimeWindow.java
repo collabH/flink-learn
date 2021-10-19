@@ -24,8 +24,8 @@ public class CountAndTimeWindow {
                     public String getKey(Tuple2<String, String> stringStringTuple2) throws Exception {
                         return stringStringTuple2.f0;
                     }
-                }).window(TumblingProcessingTimeWindows.of(Time.milliseconds(5000)))
-                .trigger(CountAndTimeTrigger.of(5))
+                }).window(TumblingProcessingTimeWindows.of(Time.milliseconds(400)))
+                .trigger(CountTriggerWithTimeout.of(5, false))
                 .process(new ProcessWindowFunction<Tuple2<String, String>, String
                         , String, TimeWindow>() {
                     @Override
