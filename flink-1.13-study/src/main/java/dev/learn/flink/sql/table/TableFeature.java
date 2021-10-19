@@ -24,8 +24,8 @@ public class TableFeature {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment streamEnv = FlinkEnvUtils.getStreamEnv();
         StreamTableEnvironment tableEnvironment = StreamTableEnvironment.create(streamEnv);
-//        changelogStream(streamEnv, tableEnvironment);
-        changelogSql(tableEnvironment);
+        changelogStream(streamEnv, tableEnvironment);
+//        changelogSql(tableEnvironment);
     }
 
     private static void changelogSql(StreamTableEnvironment tableEnv) throws Exception {
@@ -58,10 +58,10 @@ public class TableFeature {
         DataStreamSource<Row> dataStreamSource = streamEnv.fromElements(Row.ofKind(RowKind.INSERT, "hsm", 12),
                 Row.ofKind(RowKind.UPDATE_AFTER, "zs", 11),
                 Row.ofKind(RowKind.UPDATE_BEFORE, "ls", 13),
-                Row.ofKind(RowKind.DELETE, "ww", 13));
+                Row.ofKind(RowKind.DELETE, "hsm", 12));
         Table table = tableEnvironment.fromChangelogStream(dataStreamSource,
                 Schema.newBuilder().primaryKey("f0").build(),
-                ChangelogMode.all()).as("name", "age");
+                ChangelogMode.upsert()).as("name", "age");
         table.execute().print();
     }
 
