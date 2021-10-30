@@ -28,7 +28,8 @@ public class FlinkSQLInsertWithHudi {
 //                " 'hoodie.datasource.write.recordkey.field'='id'," +
 //                " 'write.precombine.field'='name')");
 
-        env.executeSql(bulkInsertSql());
+//        env.executeSql(bulkInsertSql());
+        env.executeSql(insertDataToHdfs());
         env.executeSql("insert into hudi_table values(1,'hsm'),(2,'wy'),(3,'ls'),(4,'ww'),(5,'zl')");
     }
 
@@ -40,6 +41,16 @@ public class FlinkSQLInsertWithHudi {
                 " 'path'='file:///Users/huangshimin/Documents/study/hudi'," +
                 " 'hoodie.datasource.write.recordkey.field'='id'," +
                 " 'write.operation'='bulk_insert'," +
+                " 'write.precombine.field'='name')";
+    }
+    
+    private static String insertDataToHdfs(){
+        return "create table hudi_table(" +
+                "id int," +
+                "name string)PARTITIONED BY (id)with(" +
+                " 'connector' = 'hudi'," +
+                " 'path'='hdfs:///Users/huangshimin/Documents/study/hudi'," +
+                " 'hoodie.datasource.write.recordkey.field'='id'," +
                 " 'write.precombine.field'='name')";
     }
 }

@@ -35,6 +35,7 @@ under the License.
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<log4j.version>2.12.1</log4j.version>
+		<cdc.version>2.1-SNAPSHOT</cdc.version>
 	</properties>
 
 	<repositories>
@@ -158,6 +159,13 @@ under the License.
 			<groupId>org.apache.hadoop</groupId>
 			<artifactId>hadoop-client</artifactId>
 			<version>2.8.5</version>
+		</dependency>
+
+		<!--cdc-->
+		<dependency>
+			<groupId>com.ververica</groupId>
+			<artifactId>flink-connector-mysql-cdc</artifactId>
+			<version>${cdc.version}</version>
 		</dependency>
 	</dependencies>
 

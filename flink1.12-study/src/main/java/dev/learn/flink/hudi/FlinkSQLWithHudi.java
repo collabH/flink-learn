@@ -24,7 +24,7 @@ public class FlinkSQLWithHudi {
                 "id int," +
                 "name string)PARTITIONED BY (id)with(" +
                 " 'connector' = 'hudi'," +
-                " 'path'='file:///Users/huangshimin/Documents/study/hudi'," +
+                " 'path'='hdfs:///Users/huangshimin/Documents/study/hudi'," +
                 " 'hoodie.datasource.write.recordkey.field'='id'," +
                 " 'table.type' = 'MERGE_ON_READ'," +
                 " 'read.streaming.enabled' = 'true'," +
