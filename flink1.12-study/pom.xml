@@ -35,7 +35,7 @@ under the License.
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<log4j.version>2.12.1</log4j.version>
-		<cdc.version>2.1-SNAPSHOT</cdc.version>
+		<cdc.version>1.3.0</cdc.version>
 	</properties>
 
 	<repositories>
@@ -162,11 +162,13 @@ under the License.
 		</dependency>
 
 		<!--cdc-->
+		<!-- https://mvnrepository.com/artifact/com.alibaba.ververica/flink-connector-mysql-cdc -->
 		<dependency>
-			<groupId>com.ververica</groupId>
+			<groupId>com.alibaba.ververica</groupId>
 			<artifactId>flink-connector-mysql-cdc</artifactId>
 			<version>${cdc.version}</version>
 		</dependency>
+
 	</dependencies>
 
 	<build>
