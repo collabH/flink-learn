@@ -21,7 +21,7 @@ under the License.
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>dev.learn.flink</groupId>
-	<artifactId>flink1.12-study</artifactId>
+	<artifactId>hudi-learning</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
@@ -36,6 +36,8 @@ under the License.
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<log4j.version>2.12.1</log4j.version>
 		<cdc.version>1.3.0</cdc.version>
+		<spark.version>3.2.0</spark.version>
+		<hudi.version>0.9.0</hudi.version>
 	</properties>
 
 	<repositories>
@@ -148,7 +150,7 @@ under the License.
 		<dependency>
 			<groupId>org.apache.hudi</groupId>
 			<artifactId>hudi-flink-bundle_2.12</artifactId>
-			<version>0.9.0</version>
+			<version>${hudi.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
@@ -169,9 +171,35 @@ under the License.
 			<version>${cdc.version}</version>
 		</dependency>
 
+
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-core_${scala.binary.version}</artifactId>
+			<version>${spark.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-sql_${scala.binary.version}</artifactId>
+			<version>${spark.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.hudi</groupId>
+			<artifactId>hudi-spark-bundle_${scala.binary.version}</artifactId>
+			<version>${hudi.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-avro_${scala.binary.version}</artifactId>
+			<version>${spark.version}</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
+		<sourceDirectory>src/main/scala</sourceDirectory>
 		<plugins>
 
 			<!-- Java Compiler -->
@@ -227,6 +255,24 @@ under the License.
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.scala-tools</groupId>
+				<artifactId>maven-scala-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>compile</goal>
+							<goal>testCompile</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<scalaVersion>${scala.binary.version}</scalaVersion>
+					<args>
+						<arg>-target:jvm-1.5</arg>
+					</args>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
