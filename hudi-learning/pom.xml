@@ -265,6 +265,7 @@ under the License.
 			<plugin>
 				<groupId>org.scala-tools</groupId>
 				<artifactId>maven-scala-plugin</artifactId>
+				<version>2.11</version>
 				<executions>
 					<execution>
 						<goals>
@@ -273,12 +274,6 @@ under the License.
 						</goals>
 					</execution>
 				</executions>
-				<configuration>
-					<scalaVersion>${scala.binary.version}</scalaVersion>
-					<args>
-						<arg>-target:jvm-1.5</arg>
-					</args>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>
