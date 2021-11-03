@@ -32,11 +32,12 @@ under the License.
 		<flink.version>1.12.0</flink.version>
 		<java.version>1.8</java.version>
 		<scala.binary.version>2.11</scala.binary.version>
+		<scala.version>2.11.12</scala.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<log4j.version>2.12.1</log4j.version>
 		<cdc.version>1.3.0</cdc.version>
-		<spark.version>3.2.0</spark.version>
+		<spark.version>2.4.8</spark.version>
 		<hudi.version>0.9.0</hudi.version>
 	</properties>
 
@@ -55,6 +56,11 @@ under the License.
 	</repositories>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.scala-lang</groupId>
+			<artifactId>scala-library</artifactId>
+			<version>${scala.version}</version>
+		</dependency>
 		<!-- Apache Flink dependencies -->
 		<!-- These dependencies are provided, because they should not be packaged into the JAR file. -->
 		<dependency>
