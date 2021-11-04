@@ -10,9 +10,12 @@ import org.apache.spark.sql.SparkSession
  */
 object RunContext {
 
-  def getHudiSpark() = {
-    SparkSession.builder().appName("hudi-spark")
-      .master("local[*]")
-      .getOrCreate()
-  }
+
+  def getHudiSpark() = SparkSession.builder().appName("hudi-spark")
+    .master("local[*]")
+    .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+    .config("spark.io.compression.codec", "snappy")
+    .config("spark.sql.hive.convertMetastoreParquet", "false")
+//    .config("spark.sql.extensions", "org.apache.spark.sql.hudi.HoodieSparkSessionExtension")
+    .getOrCreate()
 }
