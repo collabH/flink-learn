@@ -20,20 +20,26 @@ public class FlinkSQLWithHudi {
 
         // create hudi table
         // streaming read
-        env.executeSql("create table hudi_table(" +
-                "id int," +
-                "name string)PARTITIONED BY (id)with(" +
-                " 'connector' = 'hudi'," +
-                " 'path'='hdfs:///Users/huangshimin/Documents/study/hudi'," +
-                " 'hoodie.datasource.write.recordkey.field'='id'," +
+        env.executeSql("create table order_sink(" +
+                "order_number int," +
+                "order_date string," +
+                "purchaser int," +
+                "quantity int," +
+                "product_id int)" +
+                "PARTITIONED BY (order_number)with(" +
+                "'connector'='hudi'," +
+                "'path'='hdfs:///user/hudi/order'," +
+                "'hoodie.datasource.write.recordkey.field'='order_number'," +
                 " 'table.type' = 'MERGE_ON_READ'," +
                 " 'read.streaming.enabled' = 'true'," +
                 " 'read.streaming.check-interval' = '4'," +
-                " 'write.precombine.field'='name')");
+                "'write.precombine.field'='order_date')");
+
+
 
 //        env.executeSql("insert into hudi_table values(1,'hsm')");
 //        env.executeSql("insert into hudi_table values(1,'ls')");
-        env.executeSql("select * from  hudi_table").print();
+        env.executeSql("select * from  order_sink").print();
 //        env.executeSql("select count(*) from  hudi_table").print();
     }
 }

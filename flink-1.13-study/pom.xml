@@ -36,6 +36,7 @@ under the License.
 		<maven.compiler.source>${target.java.version}</maven.compiler.source>
 		<maven.compiler.target>${target.java.version}</maven.compiler.target>
 		<log4j.version>2.12.1</log4j.version>
+		<cdc.version>2.0.2</cdc.version>
 	</properties>
 
 	<repositories>
@@ -53,34 +54,29 @@ under the License.
 	</repositories>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.apache.flink</groupId>
+			<artifactId>flink-json</artifactId>
+			<version>${flink.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.ververica</groupId>
+			<artifactId>flink-connector-mysql-cdc</artifactId>
+			<!-- the dependency is available only for stable releases. -->
+			<version>${cdc.version}</version>
+		</dependency>
 		<!--序列化-->
 		<dependency>
 			<groupId>com.twitter</groupId>
 			<artifactId>chill-thrift</artifactId>
 			<version>0.7.6</version>
 			<!-- exclusions for dependency conversion -->
-			<exclusions>
-				<exclusion>
-					<groupId>com.esotericsoftware.kryo</groupId>
-					<artifactId>kryo</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<!-- libthrift is required by chill-thrift -->
 		<dependency>
 			<groupId>org.apache.thrift</groupId>
 			<artifactId>libthrift</artifactId>
 			<version>0.11.0</version>
-			<exclusions>
-				<exclusion>
-					<groupId>javax.servlet</groupId>
-					<artifactId>servlet-api</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.httpcomponents</groupId>
-					<artifactId>httpclient</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<!--protobuf-->
 		<dependency>
@@ -88,12 +84,6 @@ under the License.
 			<artifactId>chill-protobuf</artifactId>
 			<version>0.7.6</version>
 			<!-- exclusions for dependency conversion -->
-			<exclusions>
-				<exclusion>
-					<groupId>com.esotericsoftware.kryo</groupId>
-					<artifactId>kryo</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<!-- We need protobuf for chill-protobuf -->
 		<dependency>
@@ -117,6 +107,12 @@ under the License.
 			<groupId>org.apache.flink</groupId>
 			<artifactId>flink-walkthrough-common_${scala.binary.version}</artifactId>
 			<version>${flink.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>slf4j-api</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- This dependency is provided, because it should not be packaged into the JAR file. -->
@@ -124,11 +120,23 @@ under the License.
 			<groupId>org.apache.flink</groupId>
 			<artifactId>flink-streaming-java_${scala.binary.version}</artifactId>
 			<version>${flink.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>slf4j-api</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.flink</groupId>
 			<artifactId>flink-clients_${scala.binary.version}</artifactId>
 			<version>${flink.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>slf4j-api</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- Add connector dependencies here. They must be in the default scope (compile). -->
@@ -149,6 +157,12 @@ under the License.
 			<artifactId>log4j-slf4j-impl</artifactId>
 			<version>${log4j.version}</version>
 			<scope>runtime</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>slf4j-api</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
@@ -183,11 +197,23 @@ under the License.
 			<groupId>org.apache.flink</groupId>
 			<artifactId>flink-runtime_${scala.binary.version}</artifactId>
 			<version>${flink.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>slf4j-api</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.flink</groupId>
 			<artifactId>flink-test-utils_${scala.binary.version}</artifactId>
 			<version>${flink.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>slf4j-api</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.mockito/mockito-all -->
 		<dependency>
@@ -200,21 +226,45 @@ under the License.
 			<groupId>org.apache.flink</groupId>
 			<artifactId>flink-table-common</artifactId>
 			<version>${flink.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>slf4j-api</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.flink</groupId>
 			<artifactId>flink-table-api-java</artifactId>
 			<version>${flink.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>slf4j-api</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.flink</groupId>
 			<artifactId>flink-table-api-java-bridge_${scala.binary.version}</artifactId>
 			<version>${flink.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>slf4j-api</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.flink</groupId>
 			<artifactId>flink-table-planner-blink_${scala.binary.version}</artifactId>
 			<version>${flink.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>slf4j-api</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 	</dependencies>
 

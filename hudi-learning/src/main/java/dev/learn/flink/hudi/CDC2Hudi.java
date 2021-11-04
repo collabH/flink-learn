@@ -29,7 +29,7 @@ public class CDC2Hudi {
                 "'password'='123456'," +
                 "'database-name'='inventory'," +
                 "'server-id'='101'," +
-                "'table-name'='order')";
+                "'table-name'='orders')";
     }
 
     private static String getHudiSink() {
@@ -55,7 +55,7 @@ public class CDC2Hudi {
         tableEnv.executeSql(getCDCMysqlSource());
         tableEnv.executeSql(getHudiSink());
 
-        tableEnv.executeSql("insert into order_sink select * from order_source");
-//        tableEnv.executeSql("select * from order_source").print();
+//        tableEnv.executeSql("insert into order_sink select * from order_source");
+        tableEnv.executeSql("select * from order_source").print();
     }
 }
