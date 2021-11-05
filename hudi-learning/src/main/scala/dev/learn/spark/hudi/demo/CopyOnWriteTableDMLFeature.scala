@@ -1,6 +1,7 @@
 package dev.learn.spark.hudi.demo
 
 import dev.learn.spark.hudi.context.RunContext
+import dev.learn.spark.hudi.data.DataGenerator
 import org.apache.spark.sql.SparkSession
 
 /**
@@ -13,6 +14,6 @@ object CopyOnWriteTableDMLFeature {
 
   private val spark: SparkSession = RunContext.getHudiSpark()
   def main(args: Array[String]): Unit = {
-
+    DataGenerator.getUserData(spark).printSchema()
   }
 }
