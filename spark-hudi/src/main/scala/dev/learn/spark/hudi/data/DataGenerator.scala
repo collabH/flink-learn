@@ -1,8 +1,8 @@
 package dev.learn.spark.hudi.data
 
-import java.sql.Date
-
 import org.apache.spark.sql.SparkSession
+
+import java.sql.Date
 
 /**
  * @fileName: DataGenerator.scala

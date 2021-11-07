@@ -16,6 +16,6 @@ object RunContext {
     .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
     .config("spark.io.compression.codec", "snappy")
     .config("spark.sql.hive.convertMetastoreParquet", "false")
-//    .config("spark.sql.extensions", "org.apache.spark.sql.hudi.HoodieSparkSessionExtension")
+    //    .config("spark.sql.extensions", "org.apache.spark.sql.hudi.HoodieSparkSessionExtension")
     .getOrCreate()
 }
