@@ -1,5 +1,8 @@
 package dev.learn.spark.hudi.config
 
+import org.apache.hudi.DataSourceWriteOptions._
+import org.apache.hudi.config.HoodieWriteConfig
+
 /**
  * @fileName: HudiConfig.scala
  * @description: Hudi配置
@@ -8,4 +11,9 @@ package dev.learn.spark.hudi.config
  */
 object HudiConfig {
 
+  def getUserOptions() = Map(
+    PRECOMBINE_FIELD.key() -> "updateTime",
+    RECORDKEY_FIELD.key() -> "id",
+    PARTITIONPATH_FIELD.key() -> "partition",
+    HoodieWriteConfig.TBL_NAME.key() -> "user")
 }

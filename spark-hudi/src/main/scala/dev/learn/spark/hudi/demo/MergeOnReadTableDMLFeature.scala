@@ -3,50 +3,33 @@ package dev.learn.spark.hudi.demo
 import dev.learn.spark.hudi.config.HudiConfig
 import dev.learn.spark.hudi.context.RunContext
 import dev.learn.spark.hudi.data.DataGenerator
-import org.apache.hudi.DataSourceReadOptions._
+import org.apache.hudi.DataSourceReadOptions.{BEGIN_INSTANTTIME, END_INSTANTTIME, QUERY_TYPE, QUERY_TYPE_INCREMENTAL_OPT_VAL}
 import org.apache.hudi.DataSourceWriteOptions._
 import org.apache.hudi.QuickstartUtils
-import org.apache.spark.sql.SaveMode._
+import org.apache.spark.sql.SaveMode.{Append, Overwrite}
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 
 /**
- * @fileName: CopyOnWriteTableDMLFeature.scala
- * @description: cow表 dml操作
+ * @fileName: MergeOnReadTableDMLFeature.scala
+ * @description: mor表使用
  * @author: huangshimin
- * @date: 2021/11/4 9:02 下午
+ * @date: 2021/11/8 5:17 下午
  */
-object CopyOnWriteTableDMLFeature {
-
+object MergeOnReadTableDMLFeature {
   private val spark: SparkSession = RunContext.getHudiSpark()
-  private val USER_HDFS_PATH = "hdfs://localhost:8082/user/hudi/warehouse/user"
+  private val USER_HDFS_PATH = "hdfs://localhost:8082/user/hudi/warehouse/user1"
 
   def main(args: Array[String]): Unit = {
-    //    writeData
-    //    readData
-    //        updateData
-    //    readData
-    //    writeData
-    //    incrementalQuery
-
-    //    rangeQuery
-
-    // delete
-    //    readData
-    //    deleteData
-    //    readData
-
-    // insert overWrite table
-
-    //    readData
-    //    insertOverWriteTable
-    //    readData
-
-    // insert overwrite partition
 //    writeData
-    readData
-    insertOverWriteTable
-    readData
+//    readData
+//    deleteData
+//    readData
+
+//    incrementalQuery
+
+    rangeQuery
   }
+
 
   /**
    * 覆盖partition，类似于hive的动态分区overwrite
@@ -89,8 +72,8 @@ object CopyOnWriteTableDMLFeature {
   def rangeQuery = {
     spark.read.format("org.apache.hudi")
       .option(QUERY_TYPE.key(), QUERY_TYPE_INCREMENTAL_OPT_VAL)
-      .option(BEGIN_INSTANTTIME.key(), "20211108164930")
-      .option(END_INSTANTTIME.key(), "20211108165305")
+      .option(END_INSTANTTIME.key(), "20211108185502")
+      .option(BEGIN_INSTANTTIME.key(), "20211108185501")
       .load(USER_HDFS_PATH)
       .show()
   }
@@ -128,8 +111,7 @@ object CopyOnWriteTableDMLFeature {
       .option("hoodie.keep.max.commits", "3")
       .option("hoodie.keep.min.commits", "2")
       .option("hoodie.cleaner.commits.retained", "1")
-      .option(TABLE_TYPE.key(), COW_TABLE_TYPE_OPT_VAL)
-      .option(TABLE_TYPE.key(), COW_TABLE_TYPE_OPT_VAL)
+      .option(TABLE_TYPE.key(), MOR_TABLE_TYPE_OPT_VAL)
       .mode(Append)
       .save(USER_HDFS_PATH)
   }
@@ -137,7 +119,7 @@ object CopyOnWriteTableDMLFeature {
 
   def readData: Unit = {
     spark.read.format("org.apache.hudi")
-      .option(TABLE_TYPE.key(), COW_TABLE_TYPE_OPT_VAL)
+      .option(TABLE_TYPE.key(), MOR_TABLE_TYPE_OPT_VAL)
       // 根据时间读取数据
       //      .option(DataSourceReadOptions.TIME_TRAVEL_AS_OF_INSTANT.key(), "20211101154909")
       .load(USER_HDFS_PATH)
@@ -155,7 +137,7 @@ object CopyOnWriteTableDMLFeature {
       .option("hoodie.keep.max.commits", "3")
       .option("hoodie.keep.min.commits", "2")
       .option("hoodie.cleaner.commits.retained", "1")
-      .option(TABLE_TYPE.key(), COW_TABLE_TYPE_OPT_VAL)
+      .option(TABLE_TYPE.key(), MOR_TABLE_TYPE_OPT_VAL)
       .mode(Overwrite)
       .save(USER_HDFS_PATH)
   }
