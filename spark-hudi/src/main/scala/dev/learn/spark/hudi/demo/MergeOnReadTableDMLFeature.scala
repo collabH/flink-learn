@@ -17,17 +17,17 @@ import org.apache.spark.sql.{DataFrame, Row, SparkSession}
  */
 object MergeOnReadTableDMLFeature {
   private val spark: SparkSession = RunContext.getHudiSpark()
-  private val USER_HDFS_PATH = "hdfs://localhost:8082/user/hudi/warehouse/user1"
+  private val USER_HDFS_PATH = "hdfs://hadoop:8082/user/hudi/warehouse/user1"
 
   def main(args: Array[String]): Unit = {
-//    writeData
+    writeData
 //    readData
 //    deleteData
 //    readData
 
 //    incrementalQuery
-
-    rangeQuery
+//    rangeQuery
+    
   }
 
 
