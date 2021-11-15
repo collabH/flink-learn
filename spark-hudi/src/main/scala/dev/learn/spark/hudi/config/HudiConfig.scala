@@ -25,7 +25,16 @@ object HudiConfig {
     /**
      * compact相关配置
      */
-    ASYNC_COMPACT_ENABLE.key() -> "true")
+    ASYNC_COMPACT_ENABLE.key() -> "true",
+
+    /**
+     * cleaner配置
+     *
+     */
+    "hoodie.cleaner.policy" -> "KEEP_LATEST_COMMITS",
+    "hoodie.cleaner.commits.retained" -> "2"
+  )
+
 
   def getUserOptions() = Map(
     PRECOMBINE_FIELD.key() -> "updateTime",
