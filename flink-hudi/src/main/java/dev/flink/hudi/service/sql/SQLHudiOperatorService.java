@@ -1,0 +1,38 @@
+package dev.flink.hudi.service.sql;
+
+import dev.flink.hudi.service.HudiOperatorService;
+import org.apache.flink.table.api.TableResult;
+import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
+import org.apache.flink.types.Row;
+import org.apache.flink.util.CloseableIterator;
+
+import java.util.List;
+import java.util.function.Consumer;
+
+/**
+ * @fileName: FlinkSQHudiOperatorService.java
+ * @description: flink sql操作hudi
+ * @author: huangshimin
+ * @date: 2021/11/18 5:13 下午
+ */
+public class SQLHudiOperatorService implements HudiOperatorService<StreamTableEnvironment, SQLOperator,
+        Consumer<Row>> {
+    @Override
+    public void operation(StreamTableEnvironment streamTableEnvironment, SQLOperator sqlOperator,
+                          Consumer<Row> collector) {
+        sqlOperator.checkParams();
+        List<String> ddlSQLList = sqlOperator.getDdlSQLList();
+        for (String ddlSQL : ddlSQLList) {
+            streamTableEnvironment.executeSql(ddlSQL);
+        }
+        List<String> coreSQLList = sqlOperator.getCoreSQLList();
+        for (String coreSQL : coreSQLList) {
+            TableResult tableResult = streamTableEnvironment.executeSql(coreSQL);
+            CloseableIterator<Row> collect = tableResult.collect();
+            while (collect.hasNext()) {
+                Row row = collect.next();
+                collector.accept(row);
+            }
+        }
+    }
+}

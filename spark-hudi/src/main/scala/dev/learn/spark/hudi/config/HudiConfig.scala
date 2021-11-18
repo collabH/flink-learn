@@ -6,6 +6,7 @@ import org.apache.hudi.common.bloom.BloomFilterTypeCode
 import org.apache.hudi.common.model.HoodieCleaningPolicy
 import org.apache.hudi.common.table.marker.MarkerType
 import org.apache.hudi.config.{HoodieCompactionConfig, HoodieIndexConfig, HoodieWriteCommitCallbackConfig, HoodieWriteConfig}
+import org.apache.hudi.keygen.SimpleKeyGenerator
 import org.apache.hudi.table.action.compact.CompactionTriggerStrategy
 
 /**
@@ -74,7 +75,16 @@ object HudiConfig {
     HoodieWriteCommitCallbackConfig.CALLBACK_CLASS_NAME.key() -> classOf[HoodieWriteCommitHttpCallback].getName,
     HoodieWriteCommitCallbackConfig.CALLBACK_HTTP_URL.key() -> "http://helo.com",
     HoodieWriteCommitCallbackConfig.CALLBACK_HTTP_API_KEY_VALUE.key() -> "hudi_write_commit_http_callback",
-    HoodieWriteCommitCallbackConfig.CALLBACK_HTTP_TIMEOUT_IN_SECONDS.key() -> "3"
+    HoodieWriteCommitCallbackConfig.CALLBACK_HTTP_TIMEOUT_IN_SECONDS.key() -> "3",
+
+    /**
+     * hudi keygenerators配置
+     */
+    KEYGENERATOR_CLASS_NAME.key()->classOf[SimpleKeyGenerator].getName,
+    RECORDKEY_FIELD.key()->"ts",
+    PARTITIONPATH_FIELD.key() -> "partition",
+    URL_ENCODE_PARTITIONING.key()->"true",
+    HIVE_STYLE_PARTITIONING.key()->"true"
   )
 
 
