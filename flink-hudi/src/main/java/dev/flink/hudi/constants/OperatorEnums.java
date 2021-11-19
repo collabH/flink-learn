@@ -9,6 +9,5 @@ package dev.flink.hudi.constants;
 public enum OperatorEnums {
     INSERT,
     DELETE,
-    UPDATE,
-    UPSERT
+    QUERY
 }

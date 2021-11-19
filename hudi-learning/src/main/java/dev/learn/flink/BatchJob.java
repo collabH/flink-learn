@@ -20,6 +20,7 @@ package dev.learn.flink;
 
 
 import org.apache.flink.api.java.ExecutionEnvironment;
+import scala.runtime.Statics;
 
 /**
  * Skeleton for a Flink Batch Job.
@@ -36,7 +37,7 @@ public class BatchJob {
     public static void main(String[] args) throws Exception {
         // set up the batch execution environment
         final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-
+        Statics statics = new Statics();
         /*
          * Here, you can start creating your execution plan for Flink.
          *

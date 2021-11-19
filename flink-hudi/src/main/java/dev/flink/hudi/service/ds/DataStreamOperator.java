@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.hudi.table.HoodieTableSource;
+import org.apache.hudi.source.StreamReadMonitoringFunction;
 
 /**
  * @fileName: DataStreamOperator.java
@@ -18,9 +18,10 @@ import org.apache.hudi.table.HoodieTableSource;
 @NoArgsConstructor
 @Builder
 public class DataStreamOperator {
-    private HoodieTableSource hoodieTableSource;
+    private StreamReadMonitoringFunction streamReadMonitoringFunction;
+
 
     public void checkParams() {
-        Preconditions.checkNotNull(hoodieTableSource, "hoodieTableSource不能为空!");
+        Preconditions.checkNotNull(streamReadMonitoringFunction, "streamReadMonitoringFunction不能为空!");
     }
 }
