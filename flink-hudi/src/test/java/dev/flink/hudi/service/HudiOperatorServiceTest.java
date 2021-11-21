@@ -84,12 +84,12 @@ public class HudiOperatorServiceTest {
         SQLOperator sqlOperator = SQLOperator.builder()
                 .ddlSQLList(Lists.newArrayList(HudiSqlConfig.getDDL(cores, "hudi_user", columns, "id",
                         "update_time", "dt")))
-                .coreSQLList(Lists.newArrayList(insertSQL, "select * from hudi_user"))
+                .coreSQLList(Lists.newArrayList( "select * from hudi_user"))
                 .build();
         hudiOperatorService.operation(streamTableEnv, sqlOperator, new Consumer<Row>() {
             @Override
             public void accept(Row row) {
-                System.out.println(row);
+                System.out.println("data:"+row);
             }
         });
     }

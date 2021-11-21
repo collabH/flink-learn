@@ -50,8 +50,7 @@ object HudiSqlConfig {
        |  '${FlinkOptions.PRECOMBINE_FIELD.key}'='${preCombineKey}',
        |  '${FlinkOptions.RECORD_KEY_FIELD.key}'='${recordKey}',
        |  '${FlinkOptions.PARTITION_PATH_FIELD.key}'='${partitionKey}',
-       |  '${FlinkOptions.OPERATION.key}'='upsert',
-       |  '${FlinkOptions.METADATA_ENABLED.key}'='true'
+       |  '${FlinkOptions.OPERATION.key}'='upsert'
        |)
        |""".stripMargin
   }

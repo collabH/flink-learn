@@ -35,6 +35,7 @@ public class SQLHudiOperatorService implements HudiOperatorService<StreamTableEn
         for (String coreSQL : coreSQLList) {
             LOGGER.info("execute core SQL:{}", coreSQL);
             TableResult tableResult = streamTableEnvironment.executeSql(coreSQL);
+            tableResult.print();
             CloseableIterator<Row> collect = tableResult.collect();
             while (collect.hasNext()) {
                 Row row = collect.next();
