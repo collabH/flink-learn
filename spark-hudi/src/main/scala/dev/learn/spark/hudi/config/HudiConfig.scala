@@ -5,7 +5,7 @@ import org.apache.hudi.callback.impl.HoodieWriteCommitHttpCallback
 import org.apache.hudi.common.bloom.BloomFilterTypeCode
 import org.apache.hudi.common.model.HoodieCleaningPolicy
 import org.apache.hudi.common.table.marker.MarkerType
-import org.apache.hudi.config.{HoodieCompactionConfig, HoodieIndexConfig, HoodieWriteCommitCallbackConfig, HoodieWriteConfig}
+import org.apache.hudi.config._
 import org.apache.hudi.keygen.SimpleKeyGenerator
 import org.apache.hudi.table.action.compact.CompactionTriggerStrategy
 
@@ -17,11 +17,12 @@ import org.apache.hudi.table.action.compact.CompactionTriggerStrategy
  */
 object HudiConfig {
 
-  Map(/**
-   * markers机制相关配置：
-   * Hudi中的marker是一个表示存储中存在对应的数据文件的标签，Hudi使用它在故障和回滚场景中自动清理未提交的数据。
-   *
-   **/
+  Map(
+    /**
+     * markers机制相关配置：
+     * Hudi中的marker是一个表示存储中存在对应的数据文件的标签，Hudi使用它在故障和回滚场景中自动清理未提交的数据。
+     *
+     **/
     HoodieWriteConfig.MARKERS_TYPE.key() -> MarkerType.DIRECT.toString,
     HoodieWriteConfig.MARKERS_DELETE_PARALLELISM_VALUE -> "100",
     HoodieWriteConfig.MARKERS_TIMELINE_SERVER_BASED_BATCH_INTERVAL_MS.key() -> "50L",
@@ -61,6 +62,7 @@ object HudiConfig {
     HoodieCompactionConfig.MAX_COMMITS_TO_KEEP.key() -> "30",
     HoodieCompactionConfig.MIN_COMMITS_TO_KEEP.key() -> "20",
     HoodieCompactionConfig.COMMITS_ARCHIVAL_BATCH_SIZE.key() -> "10",
+    HoodieCompactionConfig.PARQUET_SMALL_FILE_LIMIT.key() -> "104857600",
 
     /**
      * index配置
@@ -80,11 +82,25 @@ object HudiConfig {
     /**
      * hudi keygenerators配置
      */
-    KEYGENERATOR_CLASS_NAME.key()->classOf[SimpleKeyGenerator].getName,
-    RECORDKEY_FIELD.key()->"ts",
+    KEYGENERATOR_CLASS_NAME.key() -> classOf[SimpleKeyGenerator].getName,
+    RECORDKEY_FIELD.key() -> "ts",
     PARTITIONPATH_FIELD.key() -> "partition",
-    URL_ENCODE_PARTITIONING.key()->"true",
-    HIVE_STYLE_PARTITIONING.key()->"true"
+    URL_ENCODE_PARTITIONING.key() -> "true",
+    HIVE_STYLE_PARTITIONING.key() -> "true",
+    /**
+     * clustering配置,重写数据已优化Hudi数据湖文件布局，支持异步或者同步运行，
+     * Clustering会添加了一种新的REPLACE操作类型，该操作类型将在Hudi元数据时间轴中标记Clustering操作。
+     */
+    // 在没hudi每次写入完成后触发inline clustering操作
+    HoodieClusteringConfig.INLINE_CLUSTERING.key()-> "true",
+    HoodieClusteringConfig.INLINE_CLUSTERING_MAX_COMMITS.key() -> "4",
+    HoodieClusteringConfig.PLAN_STRATEGY_TARGET_FILE_MAX_BYTES.key() -> String.valueOf(1024 * 1024 * 1024L),
+    HoodieClusteringConfig.PLAN_STRATEGY_SMALL_FILE_LIMIT.key() -> String.valueOf(600 * 1024 * 1024L),
+    HoodieClusteringConfig.PLAN_STRATEGY_SORT_COLUMNS.key() -> "update_time",
+    HoodieClusteringConfig.PLAN_STRATEGY_SKIP_PARTITIONS_FROM_LATEST.key() -> "0",
+    HoodieClusteringConfig.PLAN_STRATEGY_MAX_GROUPS.key() -> "30",
+    HoodieClusteringConfig.ASYNC_CLUSTERING_ENABLE.key() -> "true",
+    HoodieClusteringConfig.ASYNC_CLUSTERING_MAX_COMMITS.key() -> "4"
   )
 
 
