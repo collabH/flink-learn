@@ -23,7 +23,7 @@ object HudiSqlConfig {
    * @param partitionKey
    * @return
    */
-  def getDDL(parallelism: Int, tableName: String, columns: String,recordKey: String, preCombineKey: String,
+  def getDDL(parallelism: Int, tableName: String, columns: String, recordKey: String, preCombineKey: String,
              partitionKey: String) = {
     s"""
        |CREATE TABLE ${tableName}(
@@ -31,7 +31,7 @@ object HudiSqlConfig {
        |)
        |WITH (
        |  'connector' = 'hudi',
-       |  '${FlinkOptions.PATH.key()}' = 'hdfs://localhost:8020/user/flink/${tableName}',
+       |  '${FlinkOptions.PATH.key()}' = 'hdfs://hadoop:8020/user/flink/${tableName}',
        |  '${FlinkOptions.TABLE_TYPE.key()}' = '${HoodieTableType.MERGE_ON_READ}',
        |  '${FlinkOptions.COMPACTION_TRIGGER_STRATEGY.key}'='${FlinkOptions.NUM_COMMITS}',
        |  '${FlinkOptions.ARCHIVE_MAX_COMMITS.key}'='30',
@@ -55,12 +55,12 @@ object HudiSqlConfig {
        |""".stripMargin
   }
 
-  def getDML(operation: OperatorEnums, columns: String, sinkTableName: String, sourceTableName: String,
+  def getDML(operation: OperatorEnums, columnNames: String, sinkTableName: String, sourceTableName: String,
              values: String): String = {
     operation match {
       case OperatorEnums.INSERT =>
         if (StringUtils.isNotEmpty(sourceTableName)) {
-          s"""INSERT INTO $sinkTableName SELECT $columns FROM $sourceTableName"""
+          s"""INSERT INTO $sinkTableName SELECT $columnNames FROM $sourceTableName"""
         } else {
           s"""INSERT INTO $sinkTableName $values"""
         }
@@ -72,4 +72,21 @@ object HudiSqlConfig {
       }
     }
   }
+  def getGeneratorSourceSQLDDL(tableName:String,columns:String)={
+      s"""
+      |create table ${tableName}(
+      |${columns}
+      |)with(
+      | 'connector'='datagen',
+      | 'rows-per-second'='1',
+      | 'fields.id.kind'='sequence',
+      | 'fields.id.start'='1',
+      | 'fields.id.end'='200',
+      | 'fields.dt.kind'='sequence',
+      | 'fields.dt.start'='202101',
+      | 'fields.dt.end'='202112'
+      |)
+      |""".stripMargin
+  }
 }
+

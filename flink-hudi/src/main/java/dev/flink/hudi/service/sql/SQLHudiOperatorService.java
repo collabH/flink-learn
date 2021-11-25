@@ -19,12 +19,12 @@ import java.util.function.Consumer;
  */
 
 public class SQLHudiOperatorService implements HudiOperatorService<StreamTableEnvironment, SQLOperator,
-        Consumer<Row>> {
+        Consumer<TableResult>> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SQLHudiOperatorService.class);
 
     @Override
     public void operation(StreamTableEnvironment streamTableEnvironment, SQLOperator sqlOperator,
-                          Consumer<Row> collector) {
+                          Consumer<TableResult> collector) {
         sqlOperator.checkParams();
         List<String> ddlSQLList = sqlOperator.getDdlSQLList();
         for (String ddlSQL : ddlSQLList) {
@@ -35,12 +35,7 @@ public class SQLHudiOperatorService implements HudiOperatorService<StreamTableEn
         for (String coreSQL : coreSQLList) {
             LOGGER.info("execute core SQL:{}", coreSQL);
             TableResult tableResult = streamTableEnvironment.executeSql(coreSQL);
-            tableResult.print();
-            CloseableIterator<Row> collect = tableResult.collect();
-            while (collect.hasNext()) {
-                Row row = collect.next();
-                collector.accept(row);
-            }
+           collector.accept(tableResult);
         }
     }
 }
