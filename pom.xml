@@ -27,6 +27,7 @@ under the License.
         <module>iceberg-with-flink</module>
         <module>flink-1.13-study</module>
         <module>flink-hudi</module>
+        <module>hudi-java-client</module>
     </modules>
     <packaging>pom</packaging>
 

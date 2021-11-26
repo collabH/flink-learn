@@ -8,9 +8,7 @@ import dev.flink.hudi.service.sql.SQLOperator;
 import dev.hudi.HudiSqlConfig;
 import org.apache.flink.table.api.TableResult;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
-import org.apache.flink.types.Row;
 import org.junit.Test;
-import scala.runtime.Statics;
 
 import java.util.function.Consumer;
 
@@ -32,15 +30,15 @@ public class HudiOperatorServiceTest {
         StreamTableEnvironment streamTableEnv = FlinkEnvConfig.getStreamTableEnv();
         int cores = Runtime.getRuntime().availableProcessors();
         String columns = "id int,age int,name string,create_time date,update_time date,dt string";
-        String sourceTableName="source";
-        String sinkTableName="hudi_user";
-        String sourceSQLDDL = HudiSqlConfig.getGeneratorSourceSQLDDL(sourceTableName,columns);
+        String sourceTableName = "source";
+        String sinkTableName = "hudi_user";
+        String sourceSQLDDL = HudiSqlConfig.getGeneratorSourceSQLDDL(sourceTableName, columns);
         String sinkSQLDDL = HudiSqlConfig.getDDL(cores, sinkTableName, columns, "id",
-                "update_time", "dt");
+                "update_time", "dt", false);
         String insertSQLDML = HudiSqlConfig.getDML(OperatorEnums.INSERT, "*", sinkTableName, sourceTableName, "");
         SQLOperator sqlOperator = SQLOperator.builder()
-                .ddlSQLList(Lists.newArrayList(sourceSQLDDL,sinkSQLDDL))
-                .coreSQLList(Lists.newArrayList( insertSQLDML))
+                .ddlSQLList(Lists.newArrayList(sourceSQLDDL, sinkSQLDDL))
+                .coreSQLList(Lists.newArrayList(insertSQLDML))
                 .build();
         hudiOperatorService.operation(streamTableEnv, sqlOperator, new Consumer<TableResult>() {
             @Override
@@ -50,5 +48,24 @@ public class HudiOperatorServiceTest {
         });
     }
 
+
+    @Test
+    public void testStreamingRead() throws InterruptedException {
+        StreamTableEnvironment streamTableEnv = FlinkEnvConfig.getStreamTableEnv();
+        int cores = Runtime.getRuntime().availableProcessors();
+        String columns = "id int,age int,name string,create_time date,update_time date,dt string";
+        String sourceTableName = "hudi_user";
+        String sourceDDL = HudiSqlConfig.getDDL(cores, sourceTableName, columns, "id", "update_time", "dt", true);
+        hudiOperatorService.operation(streamTableEnv,
+                SQLOperator.builder().ddlSQLList(Lists.newArrayList(sourceDDL))
+                        .coreSQLList(Lists.newArrayList("select * from " + sourceTableName)).build(), new Consumer<TableResult>() {
+                    @Override
+                    public void accept(TableResult tableResult) {
+                        tableResult.print();
+                    }
+                });
+
+        Thread.sleep(10000000);
+    }
 
 }
