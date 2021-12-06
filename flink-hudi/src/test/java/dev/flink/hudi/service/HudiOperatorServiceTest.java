@@ -48,6 +48,18 @@ public class HudiOperatorServiceTest {
         });
     }
 
+    @Test
+    public void printDDL(){
+        int cores = Runtime.getRuntime().availableProcessors();
+        String columns = "id int,age int,name string,create_time date,update_time date,dt string";
+        String sourceTableName = "source";
+        String sinkTableName = "hudi_user";
+        String sourceSQLDDL = HudiSqlConfig.getGeneratorSourceSQLDDL(sourceTableName, columns);
+        String sinkSQLDDL = HudiSqlConfig.getDDL(cores, sinkTableName, columns, "id",
+                "update_time", "dt", false);
+        System.out.println(sinkSQLDDL);
+    }
+
 
     @Test
     public void testStreamingRead() throws InterruptedException {
