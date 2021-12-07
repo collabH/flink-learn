@@ -87,12 +87,13 @@ object HudiConfig {
     PARTITIONPATH_FIELD.key() -> "partition",
     URL_ENCODE_PARTITIONING.key() -> "true",
     HIVE_STYLE_PARTITIONING.key() -> "true",
+
     /**
      * clustering配置,重写数据已优化Hudi数据湖文件布局，支持异步或者同步运行，
      * Clustering会添加了一种新的REPLACE操作类型，该操作类型将在Hudi元数据时间轴中标记Clustering操作。
      */
     // 在没hudi每次写入完成后触发inline clustering操作
-    HoodieClusteringConfig.INLINE_CLUSTERING.key()-> "true",
+    HoodieClusteringConfig.INLINE_CLUSTERING.key() -> "true",
     HoodieClusteringConfig.INLINE_CLUSTERING_MAX_COMMITS.key() -> "4",
     HoodieClusteringConfig.PLAN_STRATEGY_TARGET_FILE_MAX_BYTES.key() -> String.valueOf(1024 * 1024 * 1024L),
     HoodieClusteringConfig.PLAN_STRATEGY_SMALL_FILE_LIMIT.key() -> String.valueOf(600 * 1024 * 1024L),
@@ -100,7 +101,27 @@ object HudiConfig {
     HoodieClusteringConfig.PLAN_STRATEGY_SKIP_PARTITIONS_FROM_LATEST.key() -> "0",
     HoodieClusteringConfig.PLAN_STRATEGY_MAX_GROUPS.key() -> "30",
     HoodieClusteringConfig.ASYNC_CLUSTERING_ENABLE.key() -> "true",
-    HoodieClusteringConfig.ASYNC_CLUSTERING_MAX_COMMITS.key() -> "4"
+    HoodieClusteringConfig.ASYNC_CLUSTERING_MAX_COMMITS.key() -> "4",
+
+    /**
+     * index bootstrap config
+     */
+    HoodieBootstrapConfig.BASE_PATH.key() -> "hdfs://test/boostarp/data",
+    // index bootstrap文件input逻辑类
+    HoodieBootstrapConfig.FULL_BOOTSTRAP_INPUT_PROVIDER_CLASS_NAME.key() -> "",
+    HoodieBootstrapConfig.INDEX_CLASS_NAME.key() -> "bootstrap index实现逻辑",
+    HoodieBootstrapConfig.KEYGEN_CLASS_NAME.key() -> "keyGenerator实现类",
+    HoodieBootstrapConfig.KEYGEN_TYPE.key() -> "keygen类型",
+
+    /**
+     * FULL_RECORD:在这种模式下，为每个源记录生成记录级元数据，同时生成原始记录和复制的每个记录的元数据。
+     * METADATA_ONLY:在这种模式下，仅为每个源记录生成记录级元数据，并存储在新的bootstrap位置中。
+     */
+    HoodieBootstrapConfig.MODE_SELECTOR_CLASS_NAME.key() -> "",
+    HoodieBootstrapConfig.PARALLELISM_VALUE.key() -> "",
+    HoodieBootstrapConfig.PARTITION_PATH_TRANSLATOR_CLASS_NAME.key() -> "",
+    HoodieBootstrapConfig.PARTITION_SELECTOR_REGEX_MODE.key() -> "",
+    HoodieBootstrapConfig.PARTITION_SELECTOR_REGEX_PATTERN.key() -> ""
   )
 
 
