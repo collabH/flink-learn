@@ -122,6 +122,7 @@ object HudiConfig {
     HoodieBootstrapConfig.PARTITION_PATH_TRANSLATOR_CLASS_NAME.key() -> "",
     HoodieBootstrapConfig.PARTITION_SELECTOR_REGEX_MODE.key() -> "",
     HoodieBootstrapConfig.PARTITION_SELECTOR_REGEX_PATTERN.key() -> ""
+
   )
 
 
