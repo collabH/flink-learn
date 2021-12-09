@@ -3,6 +3,7 @@ package dev.flink.hudi.config;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
+import org.apache.hudi.client.model.HoodieRowData;
 
 /**
  * @fileName: FlinkEnvConfig.java
@@ -17,7 +18,8 @@ public class FlinkEnvConfig {
      * @return
      */
     public static StreamExecutionEnvironment getStreamEnv() {
-        return StreamExecutionEnvironment.getExecutionEnvironment();
+        StreamExecutionEnvironment executionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment();
+        return executionEnvironment;
     }
 
     /**
