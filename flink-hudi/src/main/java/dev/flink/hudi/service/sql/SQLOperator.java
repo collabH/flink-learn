@@ -24,8 +24,8 @@ public class SQLOperator {
     private List<String> querySQLList;
     private List<String> insertSQLList;
 
-    public void checkParams(){
-        Preconditions.checkArgument(CollectionUtils.isNotEmpty(ddlSQLList),"ddlSqlList不能为空");
+    public void checkParams() {
+        Preconditions.checkArgument(CollectionUtils.isNotEmpty(ddlSQLList), "ddlSqlList不能为空");
     }
 }
 

@@ -31,16 +31,21 @@ public class SQLHudiOperatorService<ENV extends TableEnvironment> implements Hud
             streamTableEnvironment.executeSql(ddlSQL);
         }
         List<String> querySQLList = sqlOperator.getQuerySQLList();
-        for (String querySql : querySQLList) {
-            LOGGER.info("execute query SQL:{}", querySql);
-            collector.accept(streamTableEnvironment.executeSql(querySql));
+        if (null != querySQLList) {
+            for (String querySql : querySQLList) {
+                LOGGER.info("execute query SQL:{}", querySql);
+                collector.accept(streamTableEnvironment.executeSql(querySql));
+            }
         }
         List<String> insertSQLList = sqlOperator.getInsertSQLList();
         StatementSet statementSet = streamTableEnvironment.createStatementSet();
-        for (String coreSQL : insertSQLList) {
-            LOGGER.info("execute insert SQL:{}", coreSQL);
-            statementSet.addInsertSql(coreSQL);
-            collector.accept(statementSet.execute());
+        if (null != insertSQLList) {
+            for (String coreSQL : insertSQLList) {
+                LOGGER.info("execute insert SQL:{}", coreSQL);
+                statementSet.addInsertSql(coreSQL);
+                collector.accept(statementSet.execute());
+            }
         }
+
     }
 }

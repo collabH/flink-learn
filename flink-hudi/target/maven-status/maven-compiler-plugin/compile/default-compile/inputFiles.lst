@@ -1,0 +1,13 @@
+/Users/huangshimin/Documents/study/flink-learn/flink-hudi/src/main/java/dev/flink/hudi/builder/BaseSqlBuilder.java
+/Users/huangshimin/Documents/study/flink-learn/flink-hudi/src/main/java/dev/flink/hudi/builder/column/ColumnInfo.java
+/Users/huangshimin/Documents/study/flink-learn/flink-hudi/src/main/java/dev/flink/hudi/service/ds/DataStreamOperator.java
+/Users/huangshimin/Documents/study/flink-learn/flink-hudi/src/main/java/dev/flink/hudi/service/HudiOperatorService.java
+/Users/huangshimin/Documents/study/flink-learn/flink-hudi/src/main/java/dev/flink/hudi/service/sql/SQLOperator.java
+/Users/huangshimin/Documents/study/flink-learn/flink-hudi/src/main/java/dev/flink/hudi/driver/BulkInsertDriver.java
+/Users/huangshimin/Documents/study/flink-learn/flink-hudi/src/main/java/dev/flink/hudi/config/FlinkEnvConfig.java
+/Users/huangshimin/Documents/study/flink-learn/flink-hudi/src/main/java/dev/flink/hudi/constants/OperatorEnums.java
+/Users/huangshimin/Documents/study/flink-learn/flink-hudi/src/main/java/dev/flink/hudi/service/ds/DataStreamQueryHudiOperatorService.java
+/Users/huangshimin/Documents/study/flink-learn/flink-hudi/src/main/java/dev/flink/hudi/builder/SqlBuilderFactory.java
+/Users/huangshimin/Documents/study/flink-learn/flink-hudi/src/main/java/dev/flink/hudi/constants/SQLEngine.java
+/Users/huangshimin/Documents/study/flink-learn/flink-hudi/src/main/java/dev/flink/hudi/service/sql/SQLHudiOperatorService.java
+/Users/huangshimin/Documents/study/flink-learn/flink-hudi/src/main/java/dev/flink/hudi/builder/FlinkSqlBuilder.java
