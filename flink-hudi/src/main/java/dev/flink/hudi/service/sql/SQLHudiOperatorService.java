@@ -1,10 +1,9 @@
 package dev.flink.hudi.service.sql;
 
 import dev.flink.hudi.service.HudiOperatorService;
+import org.apache.flink.table.api.StatementSet;
+import org.apache.flink.table.api.TableEnvironment;
 import org.apache.flink.table.api.TableResult;
-import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
-import org.apache.flink.types.Row;
-import org.apache.flink.util.CloseableIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,12 +17,12 @@ import java.util.function.Consumer;
  * @date: 2021/11/18 5:13 下午
  */
 
-public class SQLHudiOperatorService implements HudiOperatorService<StreamTableEnvironment, SQLOperator,
+public class SQLHudiOperatorService<ENV extends TableEnvironment> implements HudiOperatorService<ENV, SQLOperator,
         Consumer<TableResult>> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SQLHudiOperatorService.class);
 
     @Override
-    public void operation(StreamTableEnvironment streamTableEnvironment, SQLOperator sqlOperator,
+    public void operation(ENV streamTableEnvironment, SQLOperator sqlOperator,
                           Consumer<TableResult> collector) {
         sqlOperator.checkParams();
         List<String> ddlSQLList = sqlOperator.getDdlSQLList();
@@ -31,11 +30,17 @@ public class SQLHudiOperatorService implements HudiOperatorService<StreamTableEn
             LOGGER.info("execute DDL SQL:{}", ddlSQL);
             streamTableEnvironment.executeSql(ddlSQL);
         }
-        List<String> coreSQLList = sqlOperator.getCoreSQLList();
-        for (String coreSQL : coreSQLList) {
-            LOGGER.info("execute core SQL:{}", coreSQL);
-            TableResult tableResult = streamTableEnvironment.executeSql(coreSQL);
-           collector.accept(tableResult);
+        List<String> querySQLList = sqlOperator.getQuerySQLList();
+        for (String querySql : querySQLList) {
+            LOGGER.info("execute query SQL:{}", querySql);
+            collector.accept(streamTableEnvironment.executeSql(querySql));
+        }
+        List<String> insertSQLList = sqlOperator.getInsertSQLList();
+        StatementSet statementSet = streamTableEnvironment.createStatementSet();
+        for (String coreSQL : insertSQLList) {
+            LOGGER.info("execute insert SQL:{}", coreSQL);
+            statementSet.addInsertSql(coreSQL);
+            collector.accept(statementSet.execute());
         }
     }
 }

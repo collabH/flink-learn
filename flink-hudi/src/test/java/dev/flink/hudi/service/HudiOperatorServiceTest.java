@@ -10,6 +10,7 @@ import dev.flink.hudi.constants.SQLEngine;
 import dev.flink.hudi.service.sql.SQLHudiOperatorService;
 import dev.flink.hudi.service.sql.SQLOperator;
 import dev.hudi.HudiSqlConfig;
+import org.apache.flink.table.api.TableEnvironment;
 import org.apache.flink.table.api.TableResult;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.table.factories.FactoryUtil;
@@ -19,7 +20,6 @@ import org.apache.hudi.configuration.FlinkOptions;
 import org.apache.hudi.table.HoodieTableFactory;
 import org.junit.Test;
 
-import java.util.Date;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -32,7 +32,10 @@ import java.util.function.Consumer;
 public class HudiOperatorServiceTest {
 
     private HudiOperatorService<StreamTableEnvironment, SQLOperator,
-            Consumer<TableResult>> hudiOperatorService = new SQLHudiOperatorService();
+            Consumer<TableResult>> streamHudiOperatorService = new SQLHudiOperatorService<>();
+
+    private HudiOperatorService<TableEnvironment, SQLOperator,
+            Consumer<TableResult>> batchHudiOperatorService = new SQLHudiOperatorService<>();
 
     @Test
     public void testFlinkSQLOnHudi() {
@@ -48,9 +51,9 @@ public class HudiOperatorServiceTest {
         String insertSQLDML = HudiSqlConfig.getDML(OperatorEnums.INSERT, "*", sinkTableName, sourceTableName, "");
         SQLOperator sqlOperator = SQLOperator.builder()
                 .ddlSQLList(Lists.newArrayList(sourceSQLDDL, sinkSQLDDL))
-                .coreSQLList(Lists.newArrayList(insertSQLDML))
+                .insertSQLList(Lists.newArrayList(insertSQLDML))
                 .build();
-        hudiOperatorService.operation(streamTableEnv, sqlOperator, new Consumer<TableResult>() {
+        streamHudiOperatorService.operation(streamTableEnv, sqlOperator, new Consumer<TableResult>() {
             @Override
             public void accept(TableResult tableResult) {
                 tableResult.print();
@@ -78,9 +81,9 @@ public class HudiOperatorServiceTest {
         String columns = "id int,age int,name string,create_time date,update_time date,dt string";
         String sourceTableName = "hudi_user";
         String sourceDDL = HudiSqlConfig.getDDL(cores, sourceTableName, columns, "id", "update_time", "dt", true);
-        hudiOperatorService.operation(streamTableEnv,
+        streamHudiOperatorService.operation(streamTableEnv,
                 SQLOperator.builder().ddlSQLList(Lists.newArrayList(sourceDDL))
-                        .coreSQLList(Lists.newArrayList("select * from " + sourceTableName)).build(),
+                        .querySQLList(Lists.newArrayList("select * from " + sourceTableName)).build(),
                 new Consumer<TableResult>() {
                     @Override
                     public void accept(TableResult tableResult) {
@@ -95,21 +98,21 @@ public class HudiOperatorServiceTest {
      * 不支持bulk insert
      * COW表会报错Kryo并发修改异常
      * MOR表会无限创建rollback元数据
+     * 0.10.0版本已修复
+     *
      * @throws ClassNotFoundException
      */
     @Test
-    public void testBulkInsert() throws ClassNotFoundException {
-        StreamTableEnvironment streamTableEnv = FlinkEnvConfig.getStreamTableEnv();
-        int cores = Runtime.getRuntime().availableProcessors();
-        String columns = "id int,age int,name string,create_time date,update_time date,dt string";
-        String sourceTableName = "source";
-        String sourceSQLDDL = HudiSqlConfig.getGeneratorSourceSQLDDL(sourceTableName, columns);
+    public void testBulkInsert() throws ClassNotFoundException, InterruptedException {
+        TableEnvironment tableEnv = FlinkEnvConfig.getBatchTableEnv();
+//        int cores = Runtime.getRuntime().availableProcessors();
+        int cores = 1;
 
         Map<String, Object> props = Maps.newHashMap();
         String sinkTableName = "bulk_insert_user";
         props.put(FactoryUtil.CONNECTOR.key(), HoodieTableFactory.FACTORY_ID);
         props.put(FlinkOptions.PATH.key(), "hdfs://hadoop:8020/user/flink/" + sinkTableName);
-        props.put(FlinkOptions.TABLE_TYPE.key(), HoodieTableType.MERGE_ON_READ.name());
+        props.put(FlinkOptions.TABLE_TYPE.key(), HoodieTableType.COPY_ON_WRITE.name());
         props.put(FlinkOptions.PRECOMBINE_FIELD.key(), "dt");
         props.put(FlinkOptions.RECORD_KEY_FIELD.key(), "id");
         props.put(FlinkOptions.PARTITION_PATH_FIELD.key(), "dt");
@@ -137,27 +140,65 @@ public class HudiOperatorServiceTest {
                         ColumnInfo.builder()
                                 .columnType("string")
                                 .columnName("name").build(),
-//                        ColumnInfo.builder()
-//                                .columnName("create_time")
-//                                .columnType("date").build(),
-//                        ColumnInfo.builder()
-//                                .columnName("update_time")
-//                                .columnType("date").build(),
                         ColumnInfo.builder()
                                 .columnName("dt")
                                 .columnType("string").build())).generatorDDL();
-//        String insertSQLDML = HudiSqlConfig.getDML(OperatorEnums.INSERT, "*", sinkTableName, sourceTableName, "");
-        Date date = new Date();
+        String insertSQLDML = HudiSqlConfig.getDML(OperatorEnums.INSERT, "*", sinkTableName, "", "VALUES(1,24," +
+                "'hsm','20211216')");
+        String insertSQLDML1 = HudiSqlConfig.getDML(OperatorEnums.INSERT, "*", sinkTableName, "", "VALUES(2,24," +
+                "'hsm','20211216')");
+        String insertSQLDML2 = HudiSqlConfig.getDML(OperatorEnums.INSERT, "*", sinkTableName, "", "VALUES(3,24," +
+                "'hsm','20211216')");
         SQLOperator sqlOperator = SQLOperator.builder()
                 .ddlSQLList(Lists.newArrayList(sinkDDL))
-                .coreSQLList(Lists.newArrayList("insert into "+sinkTableName+" values(1,20,'hsm','20211209')"))
+                .insertSQLList(Lists.newArrayList(insertSQLDML, insertSQLDML1, insertSQLDML2))
                 .build();
-        hudiOperatorService.operation(streamTableEnv, sqlOperator, new Consumer<TableResult>() {
+        batchHudiOperatorService.operation(tableEnv, sqlOperator, new Consumer<TableResult>() {
             @Override
             public void accept(TableResult tableResult) {
                 tableResult.print();
             }
         });
+    }
+
+
+    /**
+     * 统一读取口径
+     */
+    @Test
+    public void commonReader() {
+        TableEnvironment batchTableEnv = FlinkEnvConfig.getBatchTableEnv();
+        String sourceTableName = "bulk_insert_user";
+        Map<String, Object> props = Maps.newHashMap();
+        props.put(FactoryUtil.CONNECTOR.key(), HoodieTableFactory.FACTORY_ID);
+        props.put(FlinkOptions.PATH.key(), "hdfs://hadoop:8020/user/flink/" + sourceTableName);
+        props.put(FlinkOptions.TABLE_TYPE.key(), HoodieTableType.COPY_ON_WRITE.name());
+        props.put(FlinkOptions.PRECOMBINE_FIELD.key(), "dt");
+        props.put(FlinkOptions.RECORD_KEY_FIELD.key(), "id");
+        props.put(FlinkOptions.PARTITION_PATH_FIELD.key(), "dt");
+        props.put(FlinkOptions.TABLE_NAME.key(), sourceTableName);
+        String sourceDDL = SqlBuilderFactory.getSqlBuilder(SQLEngine.FLINK, props, sourceTableName,
+                Lists.newArrayList(ColumnInfo.builder()
+                                .columnName("id")
+                                .columnType("int").build(),
+                        ColumnInfo.builder()
+                                .columnName("age")
+                                .columnType("int").build(),
+                        ColumnInfo.builder()
+                                .columnType("string")
+                                .columnName("name").build(),
+                        ColumnInfo.builder()
+                                .columnName("dt")
+                                .columnType("string").build())).generatorDDL();
+        batchHudiOperatorService.operation(batchTableEnv, SQLOperator.builder()
+                        .querySQLList(Lists.newArrayList("select * from " + sourceTableName))
+                        .ddlSQLList(Lists.newArrayList(sourceDDL)).build(),
+                new Consumer<TableResult>() {
+                    @Override
+                    public void accept(TableResult tableResult) {
+                        tableResult.print();
+                    }
+                });
     }
 
 }

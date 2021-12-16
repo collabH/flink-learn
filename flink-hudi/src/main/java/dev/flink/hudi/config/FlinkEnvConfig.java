@@ -1,7 +1,9 @@
 package dev.flink.hudi.config;
 
+import org.apache.flink.api.common.RuntimeExecutionMode;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.EnvironmentSettings;
+import org.apache.flink.table.api.TableEnvironment;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.hudi.client.model.HoodieRowData;
 
@@ -33,4 +35,7 @@ public class FlinkEnvConfig {
                 EnvironmentSettings.newInstance().useBlinkPlanner().inStreamingMode().build());
     }
 
+    public static TableEnvironment getBatchTableEnv() {
+        return TableEnvironment.create(EnvironmentSettings.newInstance().useBlinkPlanner().inBatchMode().build());
+    }
 }

@@ -21,11 +21,11 @@ import java.util.List;
 @Builder
 public class SQLOperator {
     private List<String> ddlSQLList;
-    private List<String> coreSQLList;
+    private List<String> querySQLList;
+    private List<String> insertSQLList;
 
     public void checkParams(){
         Preconditions.checkArgument(CollectionUtils.isNotEmpty(ddlSQLList),"ddlSqlList不能为空");
-        Preconditions.checkArgument(CollectionUtils.isNotEmpty(coreSQLList),"coreSQLList不能为空");
     }
 }
 
