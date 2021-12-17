@@ -31,7 +31,7 @@ public class CommonQueryDriver {
         HudiOperatorService<StreamTableEnvironment, SQLOperator,
                 Consumer<TableResult>> streamHudiOperatorService = new SQLHudiOperatorService<>();
         StreamTableEnvironment streamTableEnv = FlinkEnvConfig.getStreamTableEnv();
-        String sourceTableName = "bulk_insert_user";
+        String sourceTableName = "update_user";
         Map<String, Object> props = Maps.newHashMap();
         props.put(FactoryUtil.CONNECTOR.key(), HoodieTableFactory.FACTORY_ID);
         props.put(FlinkOptions.PATH.key(), "hdfs://hadoop:8020/user/flink/" + sourceTableName);
@@ -41,8 +41,10 @@ public class CommonQueryDriver {
         props.put(FlinkOptions.PARTITION_PATH_FIELD.key(), "dt");
         props.put(FlinkOptions.TABLE_NAME.key(), sourceTableName);
         props.put(FlinkOptions.READ_AS_STREAMING.key(), "true");
+        props.put(FlinkOptions.READ_START_COMMIT.key(), "20211215000000");
         String sourceDDL = SqlBuilderFactory.getSqlBuilder(SQLEngine.FLINK, props, sourceTableName,
-                Lists.newArrayList(ColumnInfo.builder()
+                Lists.newArrayList(
+                        ColumnInfo.builder()
                                 .columnName("id")
                                 .columnType("int").build(),
                         ColumnInfo.builder()
