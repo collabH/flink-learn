@@ -9,6 +9,7 @@ import org.apache.hudi.common.engine.EngineType;
 import org.apache.hudi.common.model.DefaultHoodieRecordPayload;
 import org.apache.hudi.common.model.HoodieRecord;
 import org.apache.hudi.common.model.HoodieRecordLocation;
+import org.apache.hudi.config.HoodieClusteringConfig;
 import org.apache.hudi.config.HoodieIndexConfig;
 import org.apache.hudi.config.HoodieWriteConfig;
 import org.apache.hudi.index.HoodieIndex;
@@ -41,6 +42,10 @@ public class UseWriteClient {
                 .withIndexConfig(new HoodieIndexConfig.Builder()
                         .withIndexType(HoodieIndex.IndexType.BLOOM)
                         .withEngineType(EngineType.JAVA).build())
+                .withClusteringConfig(HoodieClusteringConfig.newBuilder()
+                        .withInlineClustering(true)
+                        .withAsyncClustering(true)
+                        .withClusteringSortColumns("test").build())
                 .build();
         HoodieJavaWriteClient<DefaultHoodieRecordPayload> hoodieJavaWriteClient =
                 new HoodieJavaWriteClient<DefaultHoodieRecordPayload>(hoodieJavaEngineContext, hoodieWriteConfig);
