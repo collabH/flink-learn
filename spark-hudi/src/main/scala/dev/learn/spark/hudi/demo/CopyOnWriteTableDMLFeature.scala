@@ -42,7 +42,7 @@ object CopyOnWriteTableDMLFeature {
     //    readData
 
     // insert overwrite partition
-//    writeData
+    //    writeData
     readData
     insertOverWriteTable
     readData
@@ -129,7 +129,7 @@ object CopyOnWriteTableDMLFeature {
       .option("hoodie.keep.min.commits", "2")
       .option("hoodie.cleaner.commits.retained", "1")
       .option(TABLE_TYPE.key(), COW_TABLE_TYPE_OPT_VAL)
-      .option(TABLE_TYPE.key(), COW_TABLE_TYPE_OPT_VAL)
+      .option(OPERATION.key(), UPSERT_OPERATION_OPT_VAL)
       .mode(Append)
       .save(USER_HDFS_PATH)
   }
