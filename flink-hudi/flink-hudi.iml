@@ -13,6 +13,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Maven: org.roaringbitmap:RoaringBitmap:0.9.23" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.roaringbitmap:shims:0.9.23" level="project" />
     <orderEntry type="library" name="Maven: org.alluxio:alluxio-core-client:2.7.2" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.30" level="project" />
     <orderEntry type="library" name="Maven: org.alluxio:alluxio-core-client-fs:2.7.2" level="project" />

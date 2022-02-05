@@ -37,6 +37,12 @@
     </repositories>
 
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/org.roaringbitmap/RoaringBitmap -->
+        <dependency>
+            <groupId>org.roaringbitmap</groupId>
+            <artifactId>RoaringBitmap</artifactId>
+            <version>0.9.23</version>
+        </dependency>
         <dependency>
             <groupId>org.alluxio</groupId>
             <artifactId>alluxio-core-client</artifactId>
