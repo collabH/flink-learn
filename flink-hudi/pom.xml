@@ -9,18 +9,20 @@
     <artifactId>flink-hudi</artifactId>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <flink.version>1.13.0</flink.version>
+        <flink.version>1.13.1</flink.version>
         <java.version>1.8</java.version>
         <scala.binary.version>2.11</scala.binary.version>
         <scala.version>2.11.12</scala.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <log4j.version>2.12.1</log4j.version>
-        <hudi.version>0.10.0</hudi.version>
+        <hudi.version>0.10.1</hudi.version>
         <hadoop.version>3.0.0</hadoop.version>
+        <hive.version>2.3.4</hive.version>
         <commons.collections.version>3.2.2</commons.collections.version>
         <junit.version>4.13.1</junit.version>
         <lombok.version>1.18.12</lombok.version>
+        <alluxio.version>2.7.2</alluxio.version>
     </properties>
     <repositories>
         <repository>
@@ -43,20 +45,23 @@
             <artifactId>RoaringBitmap</artifactId>
             <version>0.9.23</version>
         </dependency>
-        <dependency>
-            <groupId>org.alluxio</groupId>
-            <artifactId>alluxio-core-client</artifactId>
-            <version>2.7.2</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.alluxio</groupId>-->
+<!--            <artifactId>alluxio-core-client</artifactId>-->
+<!--            <version>${alluxio.version}</version>-->
+<!--            <scope>provided</scope>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.alluxio</groupId>
             <artifactId>alluxio-core-client-fs</artifactId>
-            <version>2.7.2</version>
+            <version>${alluxio.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.alluxio</groupId>
             <artifactId>alluxio-core-common</artifactId>
-            <version>2.7.2</version>
+            <version>${alluxio.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -127,7 +132,6 @@
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-sql-connector-kafka_${scala.binary.version}</artifactId>
             <version>${flink.version}</version>
-            <scope>provided</scope>
         </dependency>
         <!--flink table api-->
         <dependency>
@@ -172,6 +176,21 @@
                 <exclusion>
                     <artifactId>commons-compress</artifactId>
                     <groupId>org.apache.commons</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hive</groupId>
+            <artifactId>hive-exec</artifactId>
+            <version>${hive.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>pentaho-aggdesigner-algorithm</artifactId>
+                    <groupId>org.pentaho</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>antlr-runtime</artifactId>
+                    <groupId>org.antlr</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -227,17 +246,18 @@
                             <transformers>
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>dev.learn.flink.StreamingJob</mainClass>
+                                    <mainClass>dev.flink.hudi.driver.AlluxioOnHudiDriver</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.scala-tools</groupId>
                 <artifactId>maven-scala-plugin</artifactId>
-                <version>2.11</version>
+                <version>2.15.2</version>
                 <executions>
                     <execution>
                         <goals>

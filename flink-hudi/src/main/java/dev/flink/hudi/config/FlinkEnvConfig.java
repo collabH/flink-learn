@@ -1,11 +1,12 @@
 package dev.flink.hudi.config;
 
-import org.apache.flink.api.common.RuntimeExecutionMode;
+import org.apache.flink.runtime.state.CheckpointStorage;
+import org.apache.flink.streaming.api.CheckpointingMode;
+import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.table.api.TableEnvironment;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
-import org.apache.hudi.client.model.HoodieRowData;
 
 /**
  * @fileName: FlinkEnvConfig.java
@@ -21,6 +22,7 @@ public class FlinkEnvConfig {
      */
     public static StreamExecutionEnvironment getStreamEnv() {
         StreamExecutionEnvironment executionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment();
+        executionEnvironment.setParallelism(4);
         return executionEnvironment;
     }
 
@@ -31,6 +33,10 @@ public class FlinkEnvConfig {
      */
     public static StreamTableEnvironment getStreamTableEnv() {
         StreamExecutionEnvironment streamEnv = getStreamEnv();
+        CheckpointConfig checkpointConfig = streamEnv.getCheckpointConfig();
+        checkpointConfig.setCheckpointingMode(CheckpointingMode.EXACTLY_ONCE);
+        checkpointConfig.setCheckpointInterval(30000);
+        checkpointConfig.setForceUnalignedCheckpoints(true);
         return StreamTableEnvironment.create(streamEnv,
                 EnvironmentSettings.newInstance().useBlinkPlanner().inStreamingMode().build());
     }

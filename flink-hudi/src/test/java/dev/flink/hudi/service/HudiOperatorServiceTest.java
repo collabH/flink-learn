@@ -18,6 +18,7 @@ import org.apache.hudi.common.model.HoodieTableType;
 import org.apache.hudi.common.model.WriteOperationType;
 import org.apache.hudi.configuration.FlinkOptions;
 import org.apache.hudi.table.HoodieTableFactory;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Map;
@@ -38,6 +39,7 @@ public class HudiOperatorServiceTest {
             Consumer<TableResult>> batchHudiOperatorService = new SQLHudiOperatorService<>();
 
     @Test
+    @Ignore
     public void testFlinkSQLOnHudi() {
 
         StreamTableEnvironment streamTableEnv = FlinkEnvConfig.getStreamTableEnv();
@@ -62,6 +64,7 @@ public class HudiOperatorServiceTest {
     }
 
     @Test
+    @Ignore
     public void printDDL() {
         int cores = Runtime.getRuntime().availableProcessors();
         String columns = "id int,age int,name string,create_time date,update_time date,dt string";

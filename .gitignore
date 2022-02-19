@@ -36,3 +36,4 @@ flink-connector-redis/flink-connector-redis_2.11.iml
 /spark-hudi/spark-hudi.iml
 /hudi-learning/target/*
 /spark-hudi/target/*
+/flink-hudi/flink-hudi.iml
