@@ -6,6 +6,8 @@ import dev.learn.spark.hudi.data.DataGenerator
 import org.apache.hudi.DataSourceReadOptions.{BEGIN_INSTANTTIME, END_INSTANTTIME, QUERY_TYPE, QUERY_TYPE_INCREMENTAL_OPT_VAL}
 import org.apache.hudi.DataSourceWriteOptions._
 import org.apache.hudi.QuickstartUtils
+import org.apache.spark.SparkContext
+import org.apache.spark.scheduler.{SparkListener, SparkListenerTaskStart}
 import org.apache.spark.sql.SaveMode.{Append, Overwrite}
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 
@@ -27,7 +29,11 @@ object MergeOnReadTableDMLFeature {
 
 //    incrementalQuery
 //    rangeQuery
-    
+    // 添加spark监听器
+    SparkContext.getOrCreate()
+      .addSparkListener(new SparkListener {
+        override def onTaskStart(taskStart: SparkListenerTaskStart): Unit = super.onTaskStart(taskStart)
+      })
   }
 
 

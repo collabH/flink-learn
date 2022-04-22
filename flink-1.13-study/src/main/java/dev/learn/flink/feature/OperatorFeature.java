@@ -1,14 +1,9 @@
 package dev.learn.flink.feature;
 
 import dev.learn.flink.FlinkEnvUtils;
-import javafx.util.Callback;
-import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.KeySelector;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.runtime.concurrent.FutureUtils;
-import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.AsyncDataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
@@ -51,11 +46,11 @@ public class OperatorFeature {
 
 
         ds.keyBy(new KeySelector<Integer, Integer>() {
-            @Override
-            public Integer getKey(Integer value) throws Exception {
-                return value;
-            }
-        }).window(TumblingEventTimeWindows.of(Time.days(1), Time.hours(-8)))
+                    @Override
+                    public Integer getKey(Integer value) throws Exception {
+                        return value;
+                    }
+                }).window(TumblingEventTimeWindows.of(Time.days(1), Time.hours(-8)))
                 .aggregate(new AggregateFunction<Integer, Integer, Integer>() {
                     @Override
                     public Integer createAccumulator() {
@@ -112,11 +107,11 @@ public class OperatorFeature {
                         return value;
                     }
                 }).equalTo(new KeySelector<Integer, Integer>() {
-            @Override
-            public Integer getKey(Integer value) throws Exception {
-                return value;
-            }
-        }).window(TumblingProcessingTimeWindows.of(Time.milliseconds(100)))
+                    @Override
+                    public Integer getKey(Integer value) throws Exception {
+                        return value;
+                    }
+                }).window(TumblingProcessingTimeWindows.of(Time.milliseconds(100)))
                 .apply(new JoinFunction<Integer, Integer, String>() {
                     @Override
                     public String join(Integer first, Integer second) throws Exception {
@@ -132,11 +127,11 @@ public class OperatorFeature {
                         return value;
                     }
                 }).equalTo(new KeySelector<Integer, Integer>() {
-            @Override
-            public Integer getKey(Integer value) throws Exception {
-                return value;
-            }
-        }).window(SlidingEventTimeWindows.of(Time.milliseconds(2) /* size */, Time.milliseconds(1) /* slide */))
+                    @Override
+                    public Integer getKey(Integer value) throws Exception {
+                        return value;
+                    }
+                }).window(SlidingEventTimeWindows.of(Time.milliseconds(2) /* size */, Time.milliseconds(1) /* slide */))
                 .apply(new JoinFunction<Integer, Integer, String>() {
                     @Override
                     public String join(Integer first, Integer second) {
@@ -146,16 +141,16 @@ public class OperatorFeature {
 
         // internal join
         ds1.keyBy(new KeySelector<Integer, Integer>() {
-            @Override
-            public Integer getKey(Integer value) throws Exception {
-                return value;
-            }
-        }).intervalJoin(ds2.keyBy(new KeySelector<Integer, Integer>() {
-            @Override
-            public Integer getKey(Integer value) throws Exception {
-                return value;
-            }
-        })).between(Time.seconds(10), Time.seconds(20))
+                    @Override
+                    public Integer getKey(Integer value) throws Exception {
+                        return value;
+                    }
+                }).intervalJoin(ds2.keyBy(new KeySelector<Integer, Integer>() {
+                    @Override
+                    public Integer getKey(Integer value) throws Exception {
+                        return value;
+                    }
+                })).between(Time.seconds(10), Time.seconds(20))
                 .process(new ProcessJoinFunction<Integer, Integer, String>() {
                     @Override
                     public void processElement(Integer integer, Integer integer2, Context context,
@@ -193,6 +188,19 @@ public class OperatorFeature {
                 }, 1, TimeUnit.HOURS, 100);
     }
 
+    public static void main(String[] args) throws Exception {
+//        join();
+
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread t, Throwable e) {
+                System.out.println("t:" + t.getName() + " e:" + e.getMessage());
+            }
+        });
+
+        throw new RuntimeException("this is exeception");
+    }
+
     static class FutureUtils {
         public static Future<Integer> get(Integer key) {
             return new FutureTask<>(new Callable<Integer>() {
@@ -202,10 +210,5 @@ public class OperatorFeature {
                 }
             });
         }
-    }
-
-
-    public static void main(String[] args) throws Exception {
-        join();
     }
 }
