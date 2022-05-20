@@ -39,6 +39,8 @@ public class DatastreamToTableFeature {
         // 设置时区
         tableEnv.getConfig().setLocalTimeZone(ZoneId.of("Asia/Shanghai"));
 
+        // new api
+//        tableEnv.fromDataStream(dataStream,Schema.newBuilder().build());
         Table table = tableEnv.fromDataStream(dataStream, $("f0").as("name"), $("f1").as("age"),
                 $("f2").as("event_time"));
 

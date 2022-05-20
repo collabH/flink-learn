@@ -65,7 +65,8 @@ public class TimePropertiesFeature {
                         .on($("proc_time"))
                         .as("window"));
         window.groupBy($("window"))
-                .select($("window").end().as("end_time"), $("name").count().distinct().as("name_count")).execute().print();
+                .select($("window").end().as("end_time"), $("name").count().
+                        distinct().as("name_count")).execute().print();
     }
 
     /**

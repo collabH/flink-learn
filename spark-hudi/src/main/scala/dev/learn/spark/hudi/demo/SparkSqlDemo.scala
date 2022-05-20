@@ -25,6 +25,7 @@ object SparkSqlDemo {
       .withColumnRenamed("_2", "name")
     val df2: DataFrame = Seq((1, "world"), (2, "dear"), (3, "bear")).toDF().withColumnRenamed("_1", "id")
       .withColumnRenamed("_2", "name1")
+    df1.repartition($"test")
     // 关键依赖
     //    df1.join(df2.hint("SHUFFLE_HASH"),
     //      .hint("broadcast"),
