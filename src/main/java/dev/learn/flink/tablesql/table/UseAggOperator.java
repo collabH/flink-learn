@@ -61,15 +61,16 @@ public class UseAggOperator {
                 .select($("w").start(), $("w").end());
 
         // session window
-        WindowGroupedTable sessionWindow = kafkaTable.window(Session.withGap(lit(10).minutes()).on($("user_time")).as("w"))
+        WindowGroupedTable sessionWindow =
+                kafkaTable.window(Session.withGap(lit(10).minutes()).on($("user_time")).as("w"))
                 .groupBy($("w"));
 
         // over window
         Table overWindow = kafkaTable.window(Over.partitionBy($("id"))
 //                .orderBy($("user_time")).preceding(UNBOUNDED_RANGE)
-                .orderBy($("user_time")).preceding(rowInterval(10L))
-                .following(CURRENT_ROW)
-                .as("w"))
+                        .orderBy($("user_time")).preceding(rowInterval(10L))
+                        .following(CURRENT_ROW)
+                        .as("w"))
                 .select($("id").max().over($("w")));
 
         //  group by distinct
