@@ -31,10 +31,10 @@ public class CommonQueryDriver {
         HudiOperatorService<StreamTableEnvironment, SQLOperator,
                 Consumer<TableResult>> streamHudiOperatorService = new SQLHudiOperatorService<>();
         StreamTableEnvironment streamTableEnv = FlinkEnvConfig.getStreamTableEnv();
-        String sourceTableName = "update_user";
+        String sourceTableName = "update_user_mor";
         Map<String, Object> props = Maps.newHashMap();
         props.put(FactoryUtil.CONNECTOR.key(), HoodieTableFactory.FACTORY_ID);
-        props.put(FlinkOptions.PATH.key(), "hdfs://hadoop:8020/user/flink/" + sourceTableName);
+        props.put(FlinkOptions.PATH.key(), "file:///Users/huangshimin/Documents/study/hudi/storage/" + sourceTableName);
         props.put(FlinkOptions.TABLE_TYPE.key(), HoodieTableType.COPY_ON_WRITE.name());
         props.put(FlinkOptions.PRECOMBINE_FIELD.key(), "dt");
         props.put(FlinkOptions.RECORD_KEY_FIELD.key(), "id");

@@ -29,7 +29,7 @@ import java.util.function.Consumer;
  * @date: 2021/12/17 4:52 下午
  */
 public class UpdateDriver {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         HudiOperatorService<StreamTableEnvironment, SQLOperator,
                 Consumer<TableResult>> streamHudiOperatorService = new SQLHudiOperatorService<>();
         StreamTableEnvironment streamTableEnv = FlinkEnvConfig.getStreamTableEnv();
@@ -38,9 +38,9 @@ public class UpdateDriver {
         String sourceTableName = "source";
         String sourceSQLDDL = HudiSqlConfig.getGeneratorSourceSQLDDL(sourceTableName, columns);
         Map<String, Object> props = Maps.newHashMap();
-        String sinkTableName = "update_user";
+        String sinkTableName = "update_user_cow";
         props.put(FactoryUtil.CONNECTOR.key(), HoodieTableFactory.FACTORY_ID);
-        props.put(FlinkOptions.PATH.key(), "hdfs://hadoop:8020/user/flink/" + sinkTableName);
+        props.put(FlinkOptions.PATH.key(), "file:///Users/huangshimin/Documents/study/hudi/storage/" + sinkTableName);
         props.put(FlinkOptions.TABLE_TYPE.key(), HoodieTableType.COPY_ON_WRITE.name());
         props.put(FlinkOptions.PRECOMBINE_FIELD.key(), "dt");
         props.put(FlinkOptions.RECORD_KEY_FIELD.key(), "id");
@@ -55,7 +55,7 @@ public class UpdateDriver {
         props.put(FlinkOptions.ARCHIVE_MAX_COMMITS.key(), 30);
         props.put(FlinkOptions.ARCHIVE_MIN_COMMITS.key(), 20);
         props.put(FlinkOptions.BUCKET_ASSIGN_TASKS.key(), cores);
-        props.put(FlinkOptions.CLEAN_RETAIN_COMMITS.key(), 10);
+        props.put(FlinkOptions.CLEAN_RETAIN_COMMITS.key(), 1);
         props.put(FlinkOptions.WRITE_TASKS.key(), cores);
         props.put(FlinkOptions.WRITE_BATCH_SIZE.key(), "128D");
         props.put(FlinkOptions.OPERATION.key(), WriteOperationType.UPSERT.value());
@@ -83,5 +83,6 @@ public class UpdateDriver {
                 tableResult.print();
             }
         });
+        Thread.sleep(2000000);
     }
 }

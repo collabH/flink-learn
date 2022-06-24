@@ -110,8 +110,9 @@ object HudiSqlConfig {
        |)with(
        | 'connector'='datagen',
        | 'rows-per-second'='1',
+       | 'number-of-rows'='200',
        | 'fields.id.kind'='sequence',
-       | 'fields.id.start'='1',
+       | 'fields.id.start'='11',
        | 'fields.id.end'='200',
        | 'fields.dt.kind'='sequence',
        | 'fields.dt.start'='202101',

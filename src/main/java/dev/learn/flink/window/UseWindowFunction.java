@@ -43,7 +43,6 @@ public class UseWindowFunction {
 //                }).window(EventTimeSessionWindows.withGap(Time.seconds(10)))
                     // 全局窗口
                 })
-
                 .window(GlobalWindows.create())
                 .reduce(new SumReduceFunction())
                 .print("window");
