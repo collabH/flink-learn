@@ -12,6 +12,8 @@ import org.apache.hudi.configuration.FlinkOptions
  * @date: 2021/11/19 3:18 下午
  */
 object HudiSqlConfig {
+  def main(args: Array[String]): Unit = {
+  }
 
   /**
    * 获取DDL

@@ -9,14 +9,14 @@
     <artifactId>flink-hudi</artifactId>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <flink.version>1.13.1</flink.version>
+        <flink.version>1.14.0</flink.version>
         <java.version>1.8</java.version>
         <scala.binary.version>2.11</scala.binary.version>
         <scala.version>2.11.12</scala.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <log4j.version>2.12.1</log4j.version>
-        <hudi.version>0.10.1</hudi.version>
+        <hudi.version>0.11.1</hudi.version>
         <hadoop.version>3.0.0</hadoop.version>
         <hive.version>2.3.4</hive.version>
         <commons.collections.version>3.2.2</commons.collections.version>
@@ -142,7 +142,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-table-planner-blink_${scala.binary.version}</artifactId>
+            <artifactId>flink-table-planner_${scala.binary.version}</artifactId>
             <version>${flink.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -154,7 +154,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.hudi</groupId>
-            <artifactId>hudi-flink-bundle_${scala.binary.version}</artifactId>
+            <artifactId>hudi-flink</artifactId>
             <version>${hudi.version}</version>
         </dependency>
         <dependency>
@@ -165,6 +165,34 @@
                 <exclusion>
                     <artifactId>commons-compress</artifactId>
                     <groupId>org.apache.commons</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jetty-xml</artifactId>
+                    <groupId>org.eclipse.jetty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jetty-webapp</artifactId>
+                    <groupId>org.eclipse.jetty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jetty-util</artifactId>
+                    <groupId>org.eclipse.jetty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jetty-servlet</artifactId>
+                    <groupId>org.eclipse.jetty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jetty-server</artifactId>
+                    <groupId>org.eclipse.jetty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jetty-http</artifactId>
+                    <groupId>org.eclipse.jetty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jetty-io</artifactId>
+                    <groupId>org.eclipse.jetty</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
