@@ -6,11 +6,6 @@ import org.apache.hadoop.yarn.api.records.ApplicationId;
 import javax.annotation.Nullable;
 import java.util.Properties;
 
-/**
- * @author ouyanghaixiong@forchange.tech
- * @date 2020/8/26
- * @desc
- */
 public interface FlinkDeployService {
     ApplicationId submit(FlinkSubmitBo req) throws Exception;
 
