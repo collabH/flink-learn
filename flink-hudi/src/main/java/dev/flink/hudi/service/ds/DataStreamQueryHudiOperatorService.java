@@ -1,7 +1,11 @@
 package dev.flink.hudi.service.ds;
 
 import dev.flink.hudi.service.HudiOperatorService;
+import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.source.SourceFunction;
+import org.apache.flink.table.data.RowData;
+import org.apache.hudi.util.HoodiePipeline;
 
 import java.util.function.Consumer;
 
@@ -20,7 +24,18 @@ public class DataStreamQueryHudiOperatorService implements HudiOperatorService<S
                           DataStreamOperator dataStreamOperator,
                           Consumer<String> collector) {
         dataStreamOperator.checkParams();
-        // 看HoodieTableSource#produceDataStream
-
+        HoodiePipeline.Builder builder = HoodiePipeline.builder(dataStreamOperator.getTargetTable());
+        for (String column : dataStreamOperator.getColumns()) {
+            builder.column(column);
+        }
+        builder.pk(dataStreamOperator.getPk().toArray(new String[]{}))
+                .partition(dataStreamOperator.getPartition().toArray(new String[]{}))
+                .options(dataStreamOperator.getTableOptions())
+                .source(streamExecutionEnvironment).print();
+        try {
+            streamExecutionEnvironment.execute();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

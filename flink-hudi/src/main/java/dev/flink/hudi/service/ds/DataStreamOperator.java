@@ -5,7 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.hudi.source.StreamReadMonitoringFunction;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @fileName: DataStreamOperator.java
@@ -18,10 +22,18 @@ import org.apache.hudi.source.StreamReadMonitoringFunction;
 @NoArgsConstructor
 @Builder
 public class DataStreamOperator {
-    private StreamReadMonitoringFunction streamReadMonitoringFunction;
+    private String targetTable;
+    private List<String> columns;
+    private List<String> pk;
+    private List<String> partition;
+    private Map<String, String> tableOptions;
 
 
     public void checkParams() {
-        Preconditions.checkNotNull(streamReadMonitoringFunction, "streamReadMonitoringFunction不能为空!");
+        Preconditions.checkNotNull(targetTable, "targetTable不能为空!");
+        Preconditions.checkArgument(CollectionUtils.isNotEmpty(pk), "pk不能为空!");
+        Preconditions.checkArgument(CollectionUtils.isNotEmpty(partition), "partition不能为空!");
+        Preconditions.checkArgument(CollectionUtils.isNotEmpty(columns), "columns不能为空!");
+        Preconditions.checkArgument(MapUtils.isNotEmpty(tableOptions), "tableOptions不能为空!");
     }
 }
