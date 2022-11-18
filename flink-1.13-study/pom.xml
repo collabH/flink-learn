@@ -30,13 +30,13 @@ under the License.
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<flink.version>1.14.4</flink.version>
+		<flink.version>1.16.0</flink.version>
 		<target.java.version>1.8</target.java.version>
 		<scala.binary.version>2.11</scala.binary.version>
 		<maven.compiler.source>${target.java.version}</maven.compiler.source>
 		<maven.compiler.target>${target.java.version}</maven.compiler.target>
-		<log4j.version>2.12.1</log4j.version>
-		<cdc.version>2.0.2</cdc.version>
+		<log4j.version>2.19.0</log4j.version>
+		<cdc.version>2.3.0</cdc.version>
 	</properties>
 
 	<repositories>
@@ -75,27 +75,27 @@ under the License.
 		<dependency>
 			<groupId>com.twitter</groupId>
 			<artifactId>chill-thrift</artifactId>
-			<version>0.7.6</version>
+			<version>0.10.0</version>
 			<!-- exclusions for dependency conversion -->
 		</dependency>
 		<!-- libthrift is required by chill-thrift -->
 		<dependency>
 			<groupId>org.apache.thrift</groupId>
 			<artifactId>libthrift</artifactId>
-			<version>0.11.0</version>
+			<version>0.17.0</version>
 		</dependency>
 		<!--protobuf-->
 		<dependency>
 			<groupId>com.twitter</groupId>
 			<artifactId>chill-protobuf</artifactId>
-			<version>0.7.6</version>
+			<version>0.10.0</version>
 			<!-- exclusions for dependency conversion -->
 		</dependency>
 		<!-- We need protobuf for chill-protobuf -->
 		<dependency>
 			<groupId>com.google.protobuf</groupId>
 			<artifactId>protobuf-java</artifactId>
-			<version>3.7.0</version>
+			<version>3.21.9</version>
 		</dependency>
 		<!--状态处理后端-->
 		<dependency>
@@ -185,7 +185,7 @@ under the License.
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.12</version>
+			<version>1.18.24</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.flink</groupId>
@@ -201,7 +201,7 @@ under the License.
         </dependency>
 		<dependency>
 			<groupId>org.apache.flink</groupId>
-			<artifactId>flink-runtime_${scala.binary.version}</artifactId>
+			<artifactId>flink-runtime</artifactId>
 			<version>${flink.version}</version>
 			<exclusions>
 				<exclusion>
