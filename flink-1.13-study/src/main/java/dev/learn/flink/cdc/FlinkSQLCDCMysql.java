@@ -1,7 +1,6 @@
 package dev.learn.flink.cdc;
 
 import dev.learn.flink.FlinkEnvUtils;
-import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.environment.ExecutionCheckpointingOptions;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.EnvironmentSettings;
@@ -19,7 +18,7 @@ public class FlinkSQLCDCMysql {
     public static void main(String[] args) {
         StreamExecutionEnvironment streamEnv = FlinkEnvUtils.getStreamEnv();
         StreamTableEnvironment tableEnv = StreamTableEnvironment.create(streamEnv,
-                EnvironmentSettings.newInstance().useBlinkPlanner().inStreamingMode().build());
+                EnvironmentSettings.newInstance().inStreamingMode().build());
         tableEnv.getConfig().getConfiguration().set(ExecutionCheckpointingOptions.CHECKPOINTING_INTERVAL,
                 Duration.ofSeconds(3));
         tableEnv.executeSql("create table orders(" +

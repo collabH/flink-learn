@@ -27,7 +27,7 @@ public class SQLGrammarFeature {
         StreamExecutionEnvironment streamEnv = FlinkEnvUtils.getStreamEnv();
         StreamTableEnvironment tableEnvironment = StreamTableEnvironment.create(streamEnv);
         TableEnvironment batchTableEnvironment = TableEnvironment.create(
-                EnvironmentSettings.newInstance().useBlinkPlanner().inBatchMode().build());
+                EnvironmentSettings.newInstance().inBatchMode().build());
 //        with(tableEnvironment);
 //        window(tableEnvironment);
 //        windowAgg(tableEnvironment);

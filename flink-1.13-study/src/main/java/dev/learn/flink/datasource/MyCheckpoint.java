@@ -15,7 +15,8 @@ public class MyCheckpoint implements Checkpoint {
     }
 
     @Override
-    public void discard() throws Exception {
-
+    public DiscardObject markAsDiscarded() {
+        return null;
     }
+
 }

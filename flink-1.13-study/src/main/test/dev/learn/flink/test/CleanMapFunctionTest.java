@@ -1,9 +1,7 @@
 package dev.learn.flink.test;
 
 import junit.framework.TestCase;
-import org.apache.flink.runtime.checkpoint.ZooKeeperCompletedCheckpointStoreMockitoTest;
 import org.apache.flink.util.Collector;
-import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 

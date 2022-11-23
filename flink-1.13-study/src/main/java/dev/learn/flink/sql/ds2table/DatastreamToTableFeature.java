@@ -31,7 +31,7 @@ public class DatastreamToTableFeature {
         StreamExecutionEnvironment env = FlinkEnvUtils.getStreamEnv();
         StreamTableEnvironment tableEnv =
                 StreamTableEnvironment.create(env,
-                        EnvironmentSettings.newInstance().useBlinkPlanner().inStreamingMode().build());
+                        EnvironmentSettings.newInstance().inStreamingMode().build());
         DataStream<Tuple3<String, Integer, Long>> dataStream = env.fromElements(
                 Tuple3.of("Alice", 12,System.currentTimeMillis()+1000),
                 Tuple3.of("Bob", 10, System.currentTimeMillis()+1200),
