@@ -6,7 +6,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
+import org.apache.flink.api.common.state.KeyedStateStore;
+import org.apache.flink.api.common.state.ValueState;
+import org.apache.flink.api.common.state.ValueStateDescriptor;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.functions.KeySelector;
+import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
@@ -110,14 +115,30 @@ public class WindowOperator {
 //                })
                 // 全量窗口
                 .process(new ProcessWindowFunction<Event, String, Integer, TimeWindow>() {
+                    ValueStateDescriptor<String> stateDescriptor;
+
+                    @Override
+                    public void open(Configuration parameters) throws Exception {
+                        super.open(parameters);
+                        stateDescriptor = new ValueStateDescriptor<>("name",
+                                TypeInformation.of(String.class));
+
+                    }
+
                     @Override
                     public void process(Integer integer,
                                         ProcessWindowFunction<Event, String, Integer, TimeWindow>.Context context,
                                         Iterable<Event> iterable, Collector<String> collector) throws Exception {
                         System.out.println(integer);
+                        KeyedStateStore globalState = context.globalState();
+                        KeyedStateStore windowState = context.windowState();
                         for (Event event : iterable) {
-                            collector.collect(event.toString());
+                            String t = event.toString();
+                            ValueState<String> state = globalState.getState(stateDescriptor);
+                            state.update(t);
+                            collector.collect(t);
                         }
+
                     }
                 })
                 .print();
