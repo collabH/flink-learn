@@ -149,6 +149,17 @@
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.flink:flink-statebackend-changelog:1.16.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.flink:flink-statebackend-common:1.16.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.mockito:mockito-all:1.10.19" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.flink:flink-table-planner_2.12:1.16.0" level="project" />
+    <orderEntry type="library" name="Maven: org.codehaus.janino:commons-compiler:3.0.11" level="project" />
+    <orderEntry type="library" name="Maven: org.codehaus.janino:janino:3.0.11" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.flink:flink-scala_2.12:1.16.0" level="project" />
+    <orderEntry type="library" name="Maven: org.scala-lang:scala-reflect:2.12.7" level="project" />
+    <orderEntry type="library" name="Maven: org.scala-lang:scala-library:2.12.7" level="project" />
+    <orderEntry type="library" name="Maven: org.scala-lang:scala-compiler:2.12.7" level="project" />
+    <orderEntry type="library" name="Maven: org.scala-lang.modules:scala-xml_2.12:1.0.6" level="project" />
+    <orderEntry type="library" name="Maven: com.twitter:chill_2.12:0.7.6" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.flink:flink-table-runtime:1.16.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.flink:flink-cep:1.16.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.flink:flink-table-common:1.16.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.flink:flink-shaded-asm-9:9.2-15.0" level="project" />
     <orderEntry type="library" name="Maven: com.ibm.icu:icu4j:67.1" level="project" />
