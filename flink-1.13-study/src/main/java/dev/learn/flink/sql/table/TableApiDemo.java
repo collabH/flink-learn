@@ -4,8 +4,11 @@ import org.apache.flink.connector.datagen.table.DataGenConnectorOptions;
 import org.apache.flink.table.api.DataTypes;
 import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.table.api.Schema;
+import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.TableDescriptor;
 import org.apache.flink.table.api.TableEnvironment;
+
+import static org.apache.flink.table.api.Expressions.$;
 
 /**
  * @fileName: TableApiDemo.java
@@ -36,9 +39,24 @@ public class TableApiDemo {
 
 
         // 创建虚拟表
-        tableEnv.createTemporaryView("tempSourceView",tableEnv.from("tempSourceTable"));
-        
+        tableEnv.createTemporaryView("tempSourceView", tableEnv.from("tempSourceTable"));
+
         // register udf
-        tableEnv.createFunction("split_str", );
+//        tableEnv.createFunction("split_str", );
+
+        // table api test
+        Table table = tableEnv.from("tempSourceTable")
+                .filter($("id").isEqual(10))
+                .groupBy($("id"))
+                .select($("id"), $("name").count().as("nameCount"));
+        // sql
+        tableEnv.sqlQuery("select id,count(name) from tempSourceTable where id =10 group by id").execute().print();
+
+        // statementSet
+        tableEnv.createStatementSet()
+                .addInsertSql("insert into a select * from b")
+                .addInsertSql("insert into c select * from b")
+                .execute();
+
     }
 }

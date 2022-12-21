@@ -7,15 +7,11 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.DataTypes;
 import org.apache.flink.table.api.EnvironmentSettings;
-import org.apache.flink.table.api.Expressions;
 import org.apache.flink.table.api.Schema;
 import org.apache.flink.table.api.Table;
-import org.apache.flink.table.api.TableEnvironment;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
-import org.apache.flink.table.types.logical.DateType;
 import org.apache.flink.types.Row;
 
-import java.time.Instant;
 import java.time.ZoneId;
 
 import static org.apache.flink.table.api.Expressions.$;
@@ -33,17 +29,20 @@ public class DatastreamToTableFeature {
                 StreamTableEnvironment.create(env,
                         EnvironmentSettings.newInstance().inStreamingMode().build());
         DataStream<Tuple3<String, Integer, Long>> dataStream = env.fromElements(
-                Tuple3.of("Alice", 12,System.currentTimeMillis()+1000),
-                Tuple3.of("Bob", 10, System.currentTimeMillis()+1200),
-                Tuple3.of("Alice", 100, System.currentTimeMillis()+2300));
+                Tuple3.of("Alice", 12, System.currentTimeMillis() + 1000),
+                Tuple3.of("Bob", 10, System.currentTimeMillis() + 1200),
+                Tuple3.of("Alice", 100, System.currentTimeMillis() + 2300));
         // 设置时区
         tableEnv.getConfig().setLocalTimeZone(ZoneId.of("Asia/Shanghai"));
 
         // new api
 //        tableEnv.fromDataStream(dataStream,Schema.newBuilder().build());
-        Table table = tableEnv.fromDataStream(dataStream, $("f0").as("name"), $("f1").as("age"),
-                $("f2").as("event_time"));
 
+        Table table = tableEnv.fromDataStream(dataStream, Schema.newBuilder()
+                .column("name", DataTypes.STRING())
+                .column("age", DataTypes.INT())
+                .column("event_time", DataTypes.BIGINT())
+                .build());
         table.execute().print();
         env.execute();
     }
@@ -51,12 +50,12 @@ public class DatastreamToTableFeature {
     private static Table dsToTable(StreamTableEnvironment tableEnv, DataStream<Row> dataStream) {
         Table table =
                 tableEnv.fromDataStream(dataStream,
-                        Schema.newBuilder()
-                                .columnByExpression("proc_time", "PROCTIME()")
-                                // 提取row time
-                                .columnByExpression("rowtime", "CAST(f2 as timestamp_ltz(3))")
-                                // watermark
-                                .watermark("rowtime", "rowtime-INTERVAL '10' SECOND").build())
+                                Schema.newBuilder()
+                                        .columnByExpression("proc_time", "PROCTIME()")
+                                        // 提取row time
+                                        .columnByExpression("rowtime", "CAST(f2 as timestamp_ltz(3))")
+                                        // watermark
+                                        .watermark("rowtime", "rowtime-INTERVAL '10' SECOND").build())
                         .as("name", "age", "event_time");
         return table;
     }
@@ -67,6 +66,7 @@ public class DatastreamToTableFeature {
         Table tableView = tableEnv.sqlQuery("select * from test");
         // table转ds
         tableEnv.toChangelogStream(tableView).print();
+        tableEnv.toDataStream(table);
         tableEnv.toRetractStream(tableView, TypeInformation.of(Row.class)).print();
         tableEnv.toAppendStream(tableView, TypeInformation.of(Row.class)).print();
     }

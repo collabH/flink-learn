@@ -14,7 +14,7 @@ import org.apache.flink.table.types.inference.TypeInference;
 public class SplitStrUdf extends UserDefinedFunction {
     @Override
     public FunctionKind getKind() {
-        return null;
+        return FunctionKind.SCALAR;
     }
 
     @Override
