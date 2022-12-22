@@ -1,12 +1,13 @@
 package dev.learn.flink.sql.table;
 
+import dev.learn.flink.FlinkEnvUtils;
 import org.apache.flink.connector.datagen.table.DataGenConnectorOptions;
+import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.DataTypes;
-import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.table.api.Schema;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.TableDescriptor;
-import org.apache.flink.table.api.TableEnvironment;
+import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 
 import static org.apache.flink.table.api.Expressions.$;
 
@@ -18,9 +19,8 @@ import static org.apache.flink.table.api.Expressions.$;
  */
 public class TableApiDemo {
     public static void main(String[] args) {
-        TableEnvironment tableEnv = TableEnvironment.create(EnvironmentSettings.newInstance()
-                .inStreamingMode()
-                .build());
+        StreamExecutionEnvironment streamEnv = FlinkEnvUtils.getStreamEnv();
+        StreamTableEnvironment tableEnv = StreamTableEnvironment.create(streamEnv);
 
         tableEnv.createTemporaryTable("tempSourceTable", TableDescriptor.forConnector("datagen")
                 .schema(Schema.newBuilder()
@@ -50,7 +50,8 @@ public class TableApiDemo {
                 .groupBy($("id"))
                 .select($("id"), $("name").count().as("nameCount"));
         // sql
-        tableEnv.sqlQuery("select id,count(name) from tempSourceTable where id =10 group by id").execute().print();
+        tableEnv.sqlQuery("select id,count(name) from tempSourceTable where id =10 group by id")
+                .execute().print();
 
         // statementSet
         tableEnv.createStatementSet()
@@ -58,5 +59,10 @@ public class TableApiDemo {
                 .addInsertSql("insert into c select * from b")
                 .execute();
 
+
+
+
     }
+
+
 }
