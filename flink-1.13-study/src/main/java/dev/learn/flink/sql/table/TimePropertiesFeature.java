@@ -8,6 +8,9 @@ import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.Tumble;
 import org.apache.flink.table.api.TumbleWithSizeOnTimeWithAlias;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
+import org.apache.flink.table.connector.source.DynamicTableSource;
+import org.apache.flink.table.sources.StreamTableSource;
+import org.apache.flink.table.sources.TableSource;
 
 import static org.apache.flink.table.api.Expressions.$;
 import static org.apache.flink.table.api.Expressions.e;
@@ -96,6 +99,22 @@ public class TimePropertiesFeature {
                 .select($("window").start().as("window_start"), $("name")
                         .count().distinct().as("name_count"))
                 .execute().print();
+    }
+
+    /**
+     * 基于tableSource方式创建processTime
+     */
+    class CustomProcessTimeSource implements DynamicTableSource{
+
+        @Override
+        public DynamicTableSource copy() {
+            return null;
+        }
+
+        @Override
+        public String asSummaryString() {
+            return null;
+        }
     }
 
 
