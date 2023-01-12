@@ -6,6 +6,7 @@ import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.table.functions.TemporalTableFunction;
 
 import static org.apache.flink.table.api.Expressions.$;
+import static org.apache.flink.table.api.Expressions.call;
 
 /**
  * @fileName: TemporalFunctionDemo.java
@@ -22,6 +23,7 @@ public class TemporalFunctionDemo {
                 .createTemporalTableFunction($("update_time"), $("currency"));
         tEnv.createTemporaryFunction("rates", rates);
 
+        // use flink sql
         tEnv.sqlQuery("SELECT\n" +
                 "  SUM(amount * rate) AS amount\n" +
                 "FROM\n" +
@@ -29,5 +31,10 @@ public class TemporalFunctionDemo {
                 "  LATERAL TABLE (rates(order_time))\n" +
                 "WHERE\n" +
                 "  rates.currency = orders.currency");
+
+        // use table api
+        tEnv.from("orders")
+                .joinLateral(call("rates", $("order_time"))
+                        , $("orders.currency").isEqual($("rates.currency")));
     }
 }
