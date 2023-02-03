@@ -39,7 +39,6 @@
     <orderEntry type="library" name="Maven: org.glassfish.hk2.external:aopalliance-repackaged:2.6.1" level="project" />
     <orderEntry type="library" name="Maven: org.glassfish.hk2:hk2-api:2.6.1" level="project" />
     <orderEntry type="library" name="Maven: org.glassfish.hk2:hk2-utils:2.6.1" level="project" />
-    <orderEntry type="library" name="Maven: javax.xml.bind:jaxb-api:2.3.0" level="project" />
     <orderEntry type="library" name="Maven: javax.activation:activation:1.1.1" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-server:9.4.38.v20210224" level="project" />
     <orderEntry type="library" name="Maven: javax.servlet:javax.servlet-api:3.1.0" level="project" />
@@ -172,5 +171,16 @@
     <orderEntry type="library" name="Maven: org.apache.commons:commons-pool2:2.4.2" level="project" />
     <orderEntry type="library" name="Maven: org.apache.flink:flink-runtime-web:1.16.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.flink:flink-csv:1.16.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.flink:flink-connector-pulsar:1.16.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.pulsar:pulsar-client-all:2.10.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.pulsar:pulsar-client-api:2.10.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.pulsar:bouncy-castle-bc:pkg:2.10.1" level="project" />
+    <orderEntry type="library" name="Maven: org.bouncycastle:bcpkix-jdk15on:1.69" level="project" />
+    <orderEntry type="library" name="Maven: org.bouncycastle:bcprov-jdk15on:1.69" level="project" />
+    <orderEntry type="library" name="Maven: org.bouncycastle:bcutil-jdk15on:1.69" level="project" />
+    <orderEntry type="library" name="Maven: org.bouncycastle:bcprov-ext-jdk15on:1.69" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.pulsar:pulsar-client-admin-api:2.10.1" level="project" />
+    <orderEntry type="library" name="Maven: javax.xml.bind:jaxb-api:2.3.1" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:jul-to-slf4j:1.7.32" level="project" />
   </component>
 </module>
