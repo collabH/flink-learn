@@ -394,5 +394,6 @@
     <orderEntry type="library" name="Maven: org.apache.pulsar:pulsar-client-admin-api:2.10.1" level="project" />
     <orderEntry type="library" name="Maven: javax.xml.bind:jaxb-api:2.3.1" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:jul-to-slf4j:1.7.32" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.flink:flink-connector-files:1.16.0" level="project" />
   </component>
 </module>

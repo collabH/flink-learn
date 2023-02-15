@@ -7,7 +7,9 @@ import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
+import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 
 /**
  * @fileName: FlinkWordCount.java
@@ -23,7 +25,8 @@ public class FlinkWordCount {
                 , "spark", "iceberg", "hadoop", "yarn", "ds",
                 "flink", "spark", "hadoop", "flink"));
 
-        ds.map(new MapFunction<String, Tuple2<String, Long>>() {
+        SingleOutputStreamOperator<Tuple2<String, Long>> reduce = ds.map(new MapFunction<String,
+                Tuple2<String, Long>>() {
 
             @Override
             public Tuple2<String, Long> map(String word) throws Exception {
@@ -39,7 +42,16 @@ public class FlinkWordCount {
             public Tuple2<String, Long> reduce(Tuple2<String, Long> stringLongTuple2, Tuple2<String, Long> t1) throws Exception {
                 return Tuple2.of(stringLongTuple2.f0, stringLongTuple2.f1 + t1.f1);
             }
-        }).print();
+        });
+
+        reduce.print("sink1");
+        reduce.addSink(new SinkFunction<Tuple2<String, Long>>() {
+            @Override
+            public void invoke(Tuple2<String, Long> value, Context context) throws Exception {
+                SinkFunction.super.invoke(value, context);
+                System.out.println("sink2" + value);
+            }
+        });
 
         streamEnv.execute();
     }
