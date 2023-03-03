@@ -1,8 +1,10 @@
 package dev.learn.flink.watermarker;
 
 
+import dev.learn.flink.FlinkEnvUtils;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
 import java.time.Duration;
 
@@ -24,6 +26,8 @@ public class WatermarkStrategyDemo {
         // 分区对齐，防止因空闲数据过滤对应watermark导致其数据处理过慢，最终导致数据cache过大问题
         //.withWatermarkAlignment("alignment-group-1", Duration.ofSeconds(20), Duration.ofSeconds(1));
 
+        StreamExecutionEnvironment streamEnv = FlinkEnvUtils.getStreamEnv();
+        streamEnv.fromSource(null,watermarkStrategy,"test-wm");
 
     }
 }

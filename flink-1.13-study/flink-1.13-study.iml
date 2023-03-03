@@ -247,6 +247,8 @@
     <orderEntry type="library" name="Maven: org.apache.flink:flink-shaded-force-shading:15.0" level="project" />
     <orderEntry type="library" name="Maven: com.google.code.findbugs:jsr305:1.3.9" level="project" />
     <orderEntry type="library" name="Maven: org.apache.flink:flink-kubernetes:1.16.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.flink:flink-statebackend-rocksdb:1.16.0" level="project" />
+    <orderEntry type="library" name="Maven: com.ververica:frocksdbjni:6.20.3-ververica-1.0" level="project" />
     <orderEntry type="library" name="Maven: com.ververica:flink-connector-mysql-cdc:2.3.0" level="project" />
     <orderEntry type="library" name="Maven: com.ververica:flink-connector-debezium:2.3.0" level="project" />
     <orderEntry type="library" name="Maven: io.debezium:debezium-api:1.6.4.Final" level="project" />

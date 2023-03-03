@@ -11,6 +11,8 @@ import org.apache.spark.scheduler.{SparkListener, SparkListenerTaskStart}
 import org.apache.spark.sql.SaveMode.{Append, Overwrite}
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 
+import scala.collection.mutable.ArrayBuffer
+
 /**
  * @fileName: MergeOnReadTableDMLFeature.scala
  * @description: mor表使用
@@ -22,7 +24,24 @@ object MergeOnReadTableDMLFeature {
   private val USER_HDFS_PATH = "hdfs://hadoop:8082/user/hudi/warehouse/user1"
 
   def main(args: Array[String]): Unit = {
-    writeData
+    def number2Ip(number: Long): String = {
+      var n = number
+      val arr = ArrayBuffer[Long]()
+      for (i <- 1 to 4) {
+        val ni = n & 0xFF
+        arr += ni
+        n >>= 8
+      }
+      val sb = new StringBuilder
+      for (s <- arr.reverse) {
+        sb.append(s).append(".")
+      }
+      sb.deleteCharAt(sb.length - 1)
+      sb.toString
+    }
+
+    println(number2Ip(3658223799l))
+//    writeData
 //    readData
 //    deleteData
 //    readData
@@ -30,10 +49,10 @@ object MergeOnReadTableDMLFeature {
 //    incrementalQuery
 //    rangeQuery
     // 添加spark监听器
-    SparkContext.getOrCreate()
-      .addSparkListener(new SparkListener {
-        override def onTaskStart(taskStart: SparkListenerTaskStart): Unit = super.onTaskStart(taskStart)
-      })
+//    SparkContext.getOrCreate()
+//      .addSparkListener(new SparkListener {
+//        override def onTaskStart(taskStart: SparkListenerTaskStart): Unit = super.onTaskStart(taskStart)
+//      })
   }
 
 
