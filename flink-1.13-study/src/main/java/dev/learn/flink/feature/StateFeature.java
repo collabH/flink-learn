@@ -198,7 +198,6 @@ public class StateFeature {
             ValueStateDescriptor<Long> counterValueStateDesc = new ValueStateDescriptor<>(
                     "counter", TypeInformation.of(Long.class)
             );
-            this.counterValueState = getRuntimeContext().getState(counterValueStateDesc);
             // 暂时只支持processing time
             // heap statebackend 会专门存储时间戳  rocksDb会多8字节存储时间戳。
             StateTtlConfig stateTtlConfig = StateTtlConfig
@@ -217,6 +216,7 @@ public class StateFeature {
 
 
             counterValueStateDesc.enableTimeToLive(stateTtlConfig);
+            this.counterValueState = getRuntimeContext().getState(counterValueStateDesc);
 
         }
 
