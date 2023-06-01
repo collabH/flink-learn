@@ -43,13 +43,14 @@ public class LedgerApiClient {
 //                    "some context");
 
             // 创建entry至ledger中
-            long entryId = ledger.addEntry(1L, "bookkeeper-entry".getBytes(StandardCharsets.UTF_8));
-            Enumeration<LedgerEntry> ledgerEntryEnumeration = ledger.readEntries(1, 99);
+            long entryId = ledger.addEntry(0L, "bookkeeper-entry".getBytes(StandardCharsets.UTF_8));
+            Enumeration<LedgerEntry> ledgerEntryEnumeration = ledger.readEntries(0, 99);
             while (ledgerEntryEnumeration.hasMoreElements()) {
                 System.out.println(Arrays.toString(ledgerEntryEnumeration.nextElement().getEntry()));
             }
-            bookKeeper.deleteLedger(5);
-
+            bookKeeper.deleteLedger(ledgerId);
+            ledger.close();
+            bookKeeper.close();
         } catch (InterruptedException | IOException | BKException e) {
             e.printStackTrace();
         }
