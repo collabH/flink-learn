@@ -30,6 +30,7 @@ under the License.
         <module>hudi-java-client</module>
         <module>flink-1.15-study</module>
         <module>bookkeeper-study</module>
+        <module>flink-1.19-study</module>
     </modules>
     <packaging>pom</packaging>
 
